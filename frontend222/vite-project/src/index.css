@@ -1,0 +1,20 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4f46e5;
+  --primary-600: #4338ca;
+  --accent: #10b981;
+}
+
+@layer components {
+  .card { @apply bg-white rounded-xl shadow-md p-6; }
+  .fade-in { animation: fadeIn 400ms ease-out both; }
+}
+
+/* extra small helpers */
+.small { @apply text-sm text-gray-500; }
+
+
