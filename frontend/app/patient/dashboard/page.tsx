@@ -45,15 +45,15 @@ export default function PatientDashboard() {
   };
 
   return (
-    <div style={{ minHeight: "100vh" }}>
+    <div className="min-h-screen bg-bg-primary">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-6 py-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-1">
+          <h1 className="text-3xl font-bold font-display mb-1">
             Good day, <span className="gradient-text">{user?.name}</span> 👋
           </h1>
-          <p style={{ color: "var(--text-secondary)" }}>Here&apos;s an overview of your health activity</p>
+          <p className="text-text-secondary">Here&apos;s an overview of your health activity</p>
         </div>
 
         {/* Stat cards */}
@@ -68,8 +68,8 @@ export default function PatientDashboard() {
                 <Icon size={22} style={{ color }} />
               </div>
               <div>
-                <p className="text-2xl font-bold">{value}</p>
-                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{label}</p>
+                <p className="text-2xl font-bold text-text-primary">{value}</p>
+                <p className="text-sm text-text-secondary">{label}</p>
               </div>
             </div>
           ))}
@@ -87,13 +87,13 @@ export default function PatientDashboard() {
 
         {/* Appointments table */}
         <div className="glass p-6">
-          <h2 className="text-xl font-bold mb-4">My Appointments</h2>
+          <h2 className="text-xl font-bold font-display mb-4">My Appointments</h2>
           {loading ? (
-            <p style={{ color: "var(--text-secondary)" }}>Loading…</p>
+            <p className="text-text-secondary">Loading…</p>
           ) : appointments.length === 0 ? (
             <div className="text-center py-12">
-              <Calendar size={40} style={{ color: "var(--text-secondary)", margin: "0 auto 1rem" }} />
-              <p style={{ color: "var(--text-secondary)" }}>No appointments yet.</p>
+              <Calendar size={40} className="text-text-secondary mx-auto mb-4" />
+              <p className="text-text-secondary">No appointments yet.</p>
               <Link href="/patient/search" className="btn-primary mt-4 inline-flex">Book your first appointment</Link>
             </div>
           ) : (
@@ -112,14 +112,14 @@ export default function PatientDashboard() {
                 <tbody>
                   {appointments.map((a) => (
                     <tr key={a.id}>
-                      <td style={{ color: "var(--text-primary)", fontWeight: 600 }}>Dr. {a.doctor?.name}</td>
+                      <td className="font-semibold text-text-primary">Dr. {a.doctor?.name}</td>
                       <td>{a.doctor?.specialty || "—"}</td>
                       <td>{a.date}</td>
                       <td>{a.time_slot}</td>
                       <td><span className={`badge badge-${a.status}`}>{a.status}</span></td>
                       <td>
                         {a.status !== "cancelled" && (
-                          <button id={`cancel-appt-${a.id}`} onClick={() => handleCancel(a.id)} className="btn-danger" style={{ padding: "0.3rem 0.7rem", fontSize: "0.75rem" }}>
+                          <button id={`cancel-appt-${a.id}`} onClick={() => handleCancel(a.id)} className="btn-danger">
                             <XCircle size={13} /> Cancel
                           </button>
                         )}
