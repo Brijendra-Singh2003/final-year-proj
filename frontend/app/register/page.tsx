@@ -39,7 +39,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 py-12 bg-gradient-to-br from-bg-secondary via-accent-subtle to-bg-primary">
+    <div className="min-h-screen flex items-center justify-center p-6 py-12 bg-linear-to-br from-bg-secondary via-accent-subtle to-bg-primary">
       <div className="w-full max-w-md bg-bg-card rounded-2xl p-10 shadow-form border border-border">
 
         {/* Brand */}
@@ -65,7 +65,7 @@ export default function RegisterPage() {
               onClick={() => setForm({ ...form, role: r })}
               className={`flex-1 py-2.5 rounded-[10px] font-bold text-sm cursor-pointer transition-all border-2
                 ${form.role === r
-                  ? "bg-gradient-to-r from-accent to-accent-light text-white border-transparent shadow-btn"
+                  ? "bg-linear-to-r from-accent to-accent-light text-white border-transparent shadow-btn"
                   : "bg-bg-secondary text-text-secondary border-border hover:border-accent-medium"}`}
             >
               {r === "patient" ? "🧑‍⚕️ Patient" : "👨‍⚕️ Doctor"}

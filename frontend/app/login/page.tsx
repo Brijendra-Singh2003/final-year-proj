@@ -32,7 +32,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-bg-secondary via-accent-subtle to-bg-primary">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-linear-to-br from-bg-secondary via-accent-subtle to-bg-primary">
       <div className="w-full max-w-md bg-bg-card rounded-2xl p-10 shadow-form border border-border">
 
         {/* Brand */}

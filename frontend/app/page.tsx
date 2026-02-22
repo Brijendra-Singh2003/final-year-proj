@@ -122,7 +122,7 @@ export default function Home() {
           </div>
 
           {/* Hero image */}
-          <div className="animate-float rounded-3xl overflow-hidden border-2 border-accent-medium shadow-[0_24px_60px_rgba(22,163,74,0.18),_0_8px_24px_rgba(0,0,0,0.1)]">
+          <div className="animate-float rounded-3xl overflow-hidden border-2 border-accent-medium shadow-[0_24px_60px_rgba(22,163,74,0.18),0_8px_24px_rgba(0,0,0,0.1)]">
             <Image
               src="/hero_doctor.png"
               alt="Doctor consulting patient on a tablet"
@@ -225,7 +225,7 @@ export default function Home() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="bg-gradient-to-r from-accent-dark via-accent to-accent-light px-6 py-20 text-center">
+      <section className="bg-linear-to-r from-accent-dark via-accent to-accent-light px-6 py-20 text-center">
         <div className="max-w-[640px] mx-auto">
           <h2 className="font-extrabold font-display text-white text-3xl lg:text-4xl mb-4">
             Ready to take control of your health?
