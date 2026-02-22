@@ -51,7 +51,7 @@ def login(payload: schemas.UserLogin, response: Response, db: Session = Depends(
         max_age=3600,
         samesite="lax",
     )
-    return {"message": "Login successful", "user": schemas.UserOut.model_validate(user)}
+    return {"message": "Login successful", "user": schemas.UserOut.model_validate(user), "token": token}
 
 
 @router.post("/logout")

@@ -2,10 +2,11 @@ import os
 import models
 
 from datetime import datetime, timedelta
-from typing import Optional
+
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, HTTPException, status, Cookie, Header
+from typing import Optional
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from database import get_db
@@ -46,12 +47,18 @@ def decode_token(token: str) -> dict:
 
 def get_current_user(
     access_token: Optional[str] = Cookie(default=None),
+    authorization: Optional[str] = Header(default=None),
     db: Session = Depends(get_db),
 ) -> models.User:
-    if not access_token:
+    token = access_token
+
+    if not token and authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ", 1)[1]
+
+    if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    payload = decode_token(access_token)
+    payload = decode_token(token)
 
     user_id: int = payload.get("sub")
     if user_id is None:
