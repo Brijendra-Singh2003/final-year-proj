@@ -14,6 +14,10 @@ const NAV_LINKS = {
     { href: "/doctor/appointments",  label: "Appointments", icon: Calendar },
     { href: "/doctor/patients",      label: "My Patients",  icon: Users },
   ],
+  lab: [
+    { href: "/lab/dashboard",    label: "Dashboard",   icon: LayoutDashboard },
+    { href: "/lab/assignments",  label: "Assignments", icon: FileText },
+  ],
   admin: [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users",     label: "Users",     icon: Users },

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine
 import models
-from routers import auth, patients, doctors, admin
+from routers import auth, patients, doctors, admin, lab, files
 
 # Create all database tables
 models.Base.metadata.create_all(bind=engine)
@@ -26,6 +26,8 @@ app.include_router(auth.router)
 app.include_router(patients.router)
 app.include_router(doctors.router)
 app.include_router(admin.router)
+app.include_router(lab.router)
+app.include_router(files.router)
 
 
 @app.get("/", tags=["root"])

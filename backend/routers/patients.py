@@ -103,3 +103,27 @@ def my_records(
         .filter(models.MedicalRecord.patient_id == current_user.id)
         .all()
     )
+
+
+@router.get("/records/{record_id}/test-files", response_model=List[schemas.TestResultFileOut])
+def my_record_test_files(
+    record_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_patient),
+):
+    record = db.query(models.MedicalRecord).filter(
+        models.MedicalRecord.id == record_id,
+        models.MedicalRecord.patient_id == current_user.id,
+    ).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Medical record not found")
+
+    return (
+        db.query(models.TestResultFile)
+        .filter(
+            models.TestResultFile.record_id == record_id,
+            models.TestResultFile.patient_id == current_user.id,
+        )
+        .order_by(models.TestResultFile.created_at.desc())
+        .all()
+    )

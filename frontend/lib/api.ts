@@ -37,6 +37,8 @@ export const getMyAppointments = () => api.get("/patients/appointments");
 export const cancelAppointment = (id: number) =>
     api.patch(`/patients/appointments/${id}/cancel`);
 export const getMyRecords = () => api.get("/patients/records");
+export const getMyRecordTestFiles = (recordId: number) =>
+    api.get(`/patients/records/${recordId}/test-files`);
 
 // DOCTOR
 export const getDoctorAppointments = () => api.get("/doctors/appointments");
@@ -49,6 +51,25 @@ export const appendReport = (
     data: { content: string; diagnosis?: string; prescription?: string }
 ) => api.post(`/doctors/records/${recordId}/reports`, data);
 export const getMyPatients = () => api.get("/doctors/patients");
+
+export const createLabAssignment = (
+    recordId: number,
+    data: { lab_user_id: number; expires_at?: string }
+) => api.post(`/doctors/records/${recordId}/lab-assignments`, data);
+export const getRecordLabAssignments = (recordId: number) =>
+    api.get(`/doctors/records/${recordId}/lab-assignments`);
+export const getRecordTestFilesAsDoctor = (recordId: number) =>
+    api.get(`/doctors/records/${recordId}/test-files`);
+
+// LAB
+export const getMyLabAssignments = () => api.get("/lab/assignments");
+export const uploadLabTestResult = (assignmentId: number, file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api.post(`/lab/assignments/${assignmentId}/upload`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+};
 
 // ADMIN
 export const getAllUsers = () => api.get("/admin/users");

@@ -1,26 +1,42 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import { getMyRecords } from "@/lib/api";
-import { FileText, ChevronDown, ChevronUp, Pill, Stethoscope } from "lucide-react";
+import { getMyRecords, getMyRecordTestFiles } from "@/lib/api";
+import { FileText, ChevronDown, ChevronUp, Pill, Stethoscope, Paperclip } from "lucide-react";
 
 interface Report {
   id: number; content: string; diagnosis?: string; prescription?: string;
   created_at: string; doctor: { name: string; specialty?: string };
 }
-interface Record { id: number; summary?: string; created_at: string; reports: Report[]; }
+interface MedicalRecord { id: number; summary?: string; created_at: string; reports: Report[]; }
+interface TestFile {
+  id: number;
+  original_filename: string;
+  size_bytes: number;
+  created_at: string;
+}
 
 export default function RecordsPage() {
-  const [records, setRecords] = useState<Record[]>([]);
+  const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number[]>([]);
+  const [filesByRecord, setFilesByRecord] = useState<Record<number, TestFile[]>>({});
 
   useEffect(() => {
     getMyRecords().then((res) => setRecords(res.data)).finally(() => setLoading(false));
   }, []);
 
-  const toggle = (id: number) =>
-    setExpanded((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+  const toggle = async (id: number) => {
+    setExpanded((prev: number[]) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+    if (!filesByRecord[id]) {
+      try {
+        const res = await getMyRecordTestFiles(id);
+        setFilesByRecord((prev: Record<number, TestFile[]>) => ({ ...prev, [id]: res.data }));
+      } catch {
+        setFilesByRecord((prev: Record<number, TestFile[]>) => ({ ...prev, [id]: [] }));
+      }
+    }
+  };
 
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -60,6 +76,39 @@ export default function RecordsPage() {
 
                 {expanded.includes(rec.id) && (
                   <div className="px-5 pb-5">
+                    <div className="mb-5 p-4 rounded-xl"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Paperclip size={15} style={{ color: "var(--accent)" }} />
+                        <p className="font-bold">Test files</p>
+                      </div>
+                      {(filesByRecord[rec.id] || []).length === 0 ? (
+                        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No test files uploaded yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {(filesByRecord[rec.id] || []).map((f: TestFile) => (
+                            <div key={f.id} className="flex items-center justify-between gap-3 p-3 rounded-lg"
+                              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--border)" }}>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-sm truncate">{f.original_filename}</p>
+                                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                                  {new Date(f.created_at).toLocaleString()} · {(f.size_bytes / 1024).toFixed(1)} KB
+                                </p>
+                              </div>
+                              <a
+                                className="btn-secondary"
+                                href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/files/${f.id}/download`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Download
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     {rec.reports.length === 0 ? (
                       <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No reports appended yet.</p>
                     ) : (

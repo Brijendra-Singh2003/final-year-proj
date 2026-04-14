@@ -2,23 +2,35 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { getPatientRecords, appendReport } from "@/lib/api";
-import { FileText, ChevronDown, ChevronUp, Plus, X, Pill } from "lucide-react";
+import { getPatientRecords, appendReport, createLabAssignment, getRecordTestFilesAsDoctor } from "@/lib/api";
+import { FileText, ChevronDown, ChevronUp, Plus, X, Pill, UploadCloud } from "lucide-react";
 
 interface Report {
   id: number; content: string; diagnosis?: string; prescription?: string;
   created_at: string; doctor: { name: string };
 }
-interface Record { id: number; summary?: string; created_at: string; reports: Report[]; }
+interface MedicalRecord { id: number; summary?: string; created_at: string; reports: Report[]; }
+interface TestFile {
+  id: number;
+  original_filename: string;
+  size_bytes: number;
+  created_at: string;
+  hash_algo: string;
+  hash_hex: string;
+}
 
 export default function PatientHistoryPage() {
   const { id } = useParams<{ id: string }>();
-  const [records, setRecords] = useState<Record[]>([]);
+  const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number[]>([]);
+  const [activeTabByRecord, setActiveTabByRecord] = useState<Record<number, "diagnostics" | "labs">>({});
   const [reportModal, setReportModal] = useState<{ recordId: number } | null>(null);
   const [form, setForm] = useState({ content: "", diagnosis: "", prescription: "" });
   const [saving, setSaving] = useState(false);
+  const [labUserId, setLabUserId] = useState<string>("");
+  const [assigning, setAssigning] = useState<number | null>(null);
+  const [filesByRecord, setFilesByRecord] = useState<Record<number, TestFile[]>>({});
 
   const fetchRecords = async () => {
     try {
@@ -32,7 +44,12 @@ export default function PatientHistoryPage() {
   useEffect(() => { fetchRecords(); }, [id]);
 
   const toggle = (rid: number) =>
-    setExpanded((prev) => prev.includes(rid) ? prev.filter((x) => x !== rid) : [...prev, rid]);
+    setExpanded((prev: number[]) => prev.includes(rid) ? prev.filter((x) => x !== rid) : [...prev, rid]);
+
+  const fetchFiles = async (recordId: number) => {
+    const res = await getRecordTestFilesAsDoctor(recordId);
+    setFilesByRecord((prev) => ({ ...prev, [recordId]: res.data }));
+  };
 
   const handleSaveReport = async () => {
     if (!reportModal) return;
@@ -87,34 +104,135 @@ export default function PatientHistoryPage() {
 
                 {expanded.includes(rec.id) && (
                   <div className="px-5 pb-5 space-y-4">
-                    <button id={`add-report-${rec.id}`} className="btn-primary"
-                      onClick={() => setReportModal({ recordId: rec.id })}>
-                      <Plus size={15} /> Append Report
-                    </button>
+                    <div
+                      className="inline-flex items-center gap-1 p-1 rounded-xl"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}
+                    >
+                      {(["diagnostics", "labs"] as const).map((tab) => {
+                        const active = (activeTabByRecord[rec.id] ?? "diagnostics") === tab;
+                        return (
+                          <button
+                            key={tab}
+                            type="button"
+                            onClick={() => setActiveTabByRecord((prev) => ({ ...prev, [rec.id]: tab }))}
+                            className={"px-3 py-2 text-sm font-semibold transition border-b-3 " +
+                              (active ? "border-accent-light" : "text-text-secondary border-transparent")
+                            }
+                          >
+                            {tab === "diagnostics" ? "Diagnostics" : "Lab results"}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                    {rec.reports.length === 0 ? (
-                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No reports yet.</p>
-                    ) : rec.reports.map((rpt) => (
-                      <div key={rpt.id} className="p-4 rounded-xl"
-                        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-semibold text-sm">Dr. {rpt.doctor?.name}</span>
-                          <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                            · {new Date(rpt.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-sm mb-2" style={{ color: "var(--text-secondary)" }}>{rpt.content}</p>
-                        {rpt.diagnosis && (
-                          <p className="text-sm"><strong style={{ color: "#f59e0b" }}>Diagnosis:</strong> {rpt.diagnosis}</p>
-                        )}
-                        {rpt.prescription && (
-                          <div className="flex items-start gap-1 text-sm mt-1">
-                            <Pill size={13} style={{ color: "#10b981", marginTop: 2 }} />
-                            <span>{rpt.prescription}</span>
+                    {(activeTabByRecord[rec.id] ?? "diagnostics") === "diagnostics" ? (
+                      <div className="space-y-4">
+                        <button
+                          id={`add-report-${rec.id}`}
+                          className="btn-primary"
+                          onClick={() => setReportModal({ recordId: rec.id })}
+                        >
+                          <Plus size={15} /> Add Report
+                        </button>
+
+                        {rec.reports.length === 0 ? (
+                          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No reports yet.</p>
+                        ) : rec.reports.map((rpt) => (
+                          <div key={rpt.id} className="p-4 rounded-xl"
+                            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-semibold text-sm">Dr. {rpt.doctor?.name}</span>
+                              <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                                · {new Date(rpt.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p className="text-sm mb-2" style={{ color: "var(--text-secondary)" }}>{rpt.content}</p>
+                            {rpt.diagnosis && (
+                              <p className="text-sm"><strong style={{ color: "#f59e0b" }}>Diagnosis:</strong> {rpt.diagnosis}</p>
+                            )}
+                            {rpt.prescription && (
+                              <div className="flex items-start gap-1 text-sm mt-1">
+                                <Pill size={13} style={{ color: "#10b981", marginTop: 2 }} />
+                                <span>{rpt.prescription}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      <div className="p-4 rounded-xl"
+                        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}>
+                        <p className="font-bold mb-2">Lab test results</p>
+                        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+                          <div className="flex-1">
+                            <label className="text-sm">Lab uploader user id</label>
+                            <input
+                              className="input"
+                              placeholder="e.g. 12"
+                              value={labUserId}
+                              onChange={(e) => setLabUserId(e.target.value)}
+                            />
+                          </div>
+                          <button
+                            className="btn-secondary"
+                            disabled={!labUserId || assigning === rec.id}
+                            onClick={async () => {
+                              const labId = parseInt(labUserId);
+                              if (Number.isNaN(labId)) return alert("Enter a valid lab user id");
+                              setAssigning(rec.id);
+                              try {
+                                await createLabAssignment(rec.id, { lab_user_id: labId });
+                                alert("Assigned lab uploader. They can upload once.");
+                              } catch (err: unknown) {
+                                const e = err as { response?: { data?: { detail?: string } } };
+                                alert(e?.response?.data?.detail || "Failed to assign lab");
+                              } finally {
+                                setAssigning(null);
+                              }
+                            }}
+                          >
+                            <UploadCloud size={15} /> {assigning === rec.id ? "Assigning…" : "Assign lab"}
+                          </button>
+                          <button
+                            className="btn-ghost px-3.5 py-2"
+                            onClick={() => fetchFiles(rec.id)}
+                            style={{ border: "1px solid var(--border)" }}
+                          >
+                            Refresh files
+                          </button>
+                        </div>
+
+                        <div className="mt-4">
+                          {(filesByRecord[rec.id] || []).length === 0 ? (
+                            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                              No uploaded test files yet.
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {(filesByRecord[rec.id] || []).map((f: TestFile) => (
+                                <div key={f.id} className="flex items-center justify-between gap-3 p-3 rounded-lg"
+                                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--border)" }}>
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-sm truncate">{f.original_filename}</p>
+                                    <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                                      {new Date(f.created_at).toLocaleString()} · {(f.size_bytes / 1024).toFixed(1)} KB · {f.hash_algo}
+                                    </p>
+                                  </div>
+                                  <a
+                                    className="btn-secondary"
+                                    href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/files/${f.id}/download`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    Download
+                                  </a>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
