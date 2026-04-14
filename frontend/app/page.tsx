@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 const FEATURES = [
-  { icon: Calendar,    title: "Easy Appointment Booking",  desc: "Find and book doctors in minutes. Smart scheduling that fits your life.",          color: "text-accent",       bg: "bg-accent-subtle" },
+  { icon: Calendar,    title: "Easy Appointment Booking",   desc: "Find and book doctors in minutes. Smart scheduling that fits your life.",          color: "text-accent",       bg: "bg-accent-subtle" },
   { icon: FileText,    title: "Digital Medical Records",    desc: "All your health history in one secure place. Access anytime, anywhere.",           color: "text-violet-600",   bg: "bg-violet-50" },
   { icon: Shield,      title: "Privacy & Security",         desc: "Bank-grade encryption keeps your sensitive health data safe.",                      color: "text-cyan-600",     bg: "bg-cyan-50" },
   { icon: Stethoscope, title: "Expert Doctors",             desc: "Connect with verified specialists across 30+ medical disciplines.",                  color: "text-amber-600",    bg: "bg-amber-50" },

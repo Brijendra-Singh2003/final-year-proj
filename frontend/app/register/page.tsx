@@ -20,7 +20,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -84,7 +84,7 @@ export default function RegisterPage() {
             <label>Full Name</label>
             <div className="relative">
               <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-              <input id="name" type="text" required className="input" style={{ paddingLeft: "2.5rem" }}
+              <input id="name" type="text" required className="input pl-10" style={{ paddingLeft: "2.5rem" }}
                 placeholder="Jane Smith" value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
