@@ -1,11 +1,13 @@
 import hashlib
 import os
+import tempfile
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 import auth
+import crypto
 import models
 from database import get_db
 
@@ -28,25 +30,27 @@ def download_file(
     # - patient: only own files
     # - doctor: must have appointment with the patient
     # - admin: allowed
-    if current_user.role == models.RoleEnum.patient:
-        if f.patient_id != current_user.id:
+    match current_user.role:
+        case models.RoleEnum.patient:
+            if f.patient_id != current_user.id:
+                raise HTTPException(status_code=403, detail="Access denied")
+        case models.RoleEnum.doctor:
+            has_appointment = db.query(models.Appointment).filter(
+                models.Appointment.doctor_id == current_user.id,
+                models.Appointment.patient_id == f.patient_id,
+            ).first()
+            if not has_appointment:
+                raise HTTPException(status_code=403, detail="No appointment with this patient")
+        case models.RoleEnum.admin:
+            pass
+        case _:
             raise HTTPException(status_code=403, detail="Access denied")
-    elif current_user.role == models.RoleEnum.doctor:
-        has_appointment = db.query(models.Appointment).filter(
-            models.Appointment.doctor_id == current_user.id,
-            models.Appointment.patient_id == f.patient_id,
-        ).first()
-        if not has_appointment:
-            raise HTTPException(status_code=403, detail="No appointment with this patient")
-    elif current_user.role == models.RoleEnum.admin:
-        pass
-    else:
-        raise HTTPException(status_code=403, detail="Access denied")
 
     if not os.path.exists(f.storage_path):
         raise HTTPException(status_code=404, detail="File missing on server")
 
     if verify_hash:
+        # Hash check must run on the encrypted bytes (as stored), matching what was hashed on upload
         h = hashlib.sha256()
         with open(f.storage_path, "rb") as src:
             for chunk in iter(lambda: src.read(1024 * 1024), b""):
@@ -54,9 +58,17 @@ def download_file(
         if f.hash_algo.lower() == "sha256" and h.hexdigest() != f.hash_hex:
             raise HTTPException(status_code=409, detail="File integrity check failed")
 
-    return FileResponse(
-        path=f.storage_path,
-        media_type=f.content_type or "application/octet-stream",
-        filename=f.original_filename,
-    )
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".dec")
+    tmp.close()
+    try:
+        crypto.decrypt_file(f.storage_path, tmp.name)
+        return FileResponse(
+            path=tmp.name,
+            media_type=f.content_type or "application/octet-stream",
+            filename=f.original_filename,
+            background=None,
+        )
+    except Exception:
+        os.unlink(tmp.name)
+        raise HTTPException(status_code=500, detail="Failed to decrypt file")
 

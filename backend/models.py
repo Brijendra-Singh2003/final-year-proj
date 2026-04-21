@@ -77,6 +77,7 @@ class Appointment(Base):
 
     patient = relationship("User", foreign_keys=[patient_id], back_populates="appointments_as_patient")
     doctor = relationship("User", foreign_keys=[doctor_id], back_populates="appointments_as_doctor")
+    medical_record = relationship("MedicalRecord", back_populates="appointment", uselist=False)
 
 
 class MedicalRecord(Base):
@@ -84,11 +85,13 @@ class MedicalRecord(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=True, unique=True)
     summary = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     patient = relationship("User", back_populates="records")
+    appointment = relationship("Appointment", back_populates="medical_record")
     reports = relationship("Report", back_populates="record", cascade="all, delete-orphan")
     lab_upload_assignments = relationship(
         "LabUploadAssignment", back_populates="record", cascade="all, delete-orphan"

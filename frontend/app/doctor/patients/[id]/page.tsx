@@ -2,22 +2,22 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { getPatientRecords, appendReport, createLabAssignment, getRecordTestFilesAsDoctor } from "@/lib/api";
+import { getPatientRecords, appendReport, createLabAssignment, getLabUsers, createPatientRecord } from "@/lib/api";
 import { FileText, ChevronDown, ChevronUp, Plus, X, Pill, UploadCloud } from "lucide-react";
 
 interface Report {
   id: number; content: string; diagnosis?: string; prescription?: string;
   created_at: string; doctor: { name: string };
 }
-interface MedicalRecord { id: number; summary?: string; created_at: string; reports: Report[]; }
 interface TestFile {
-  id: number;
-  original_filename: string;
-  size_bytes: number;
-  created_at: string;
-  hash_algo: string;
-  hash_hex: string;
+  id: number; original_filename: string; size_bytes: number;
+  created_at: string; hash_algo: string; hash_hex: string;
 }
+interface MedicalRecord {
+  id: number; summary?: string; created_at: string;
+  reports: Report[]; test_result_files: TestFile[];
+}
+interface LabUser { id: number; name: string; }
 
 export default function PatientHistoryPage() {
   const { id } = useParams<{ id: string }>();
@@ -25,12 +25,19 @@ export default function PatientHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number[]>([]);
   const [activeTabByRecord, setActiveTabByRecord] = useState<Record<number, "diagnostics" | "labs">>({});
+  const [labUsers, setLabUsers] = useState<LabUser[]>([]);
+  const [labUserId, setLabUserId] = useState<string>("");
+  const [assigning, setAssigning] = useState<number | null>(null);
+
+  // New record modal
+  const [newRecordModal, setNewRecordModal] = useState(false);
+  const [newRecordSummary, setNewRecordSummary] = useState("");
+  const [creatingRecord, setCreatingRecord] = useState(false);
+
+  // Report modal
   const [reportModal, setReportModal] = useState<{ recordId: number } | null>(null);
   const [form, setForm] = useState({ content: "", diagnosis: "", prescription: "" });
   const [saving, setSaving] = useState(false);
-  const [labUserId, setLabUserId] = useState<string>("");
-  const [assigning, setAssigning] = useState<number | null>(null);
-  const [filesByRecord, setFilesByRecord] = useState<Record<number, TestFile[]>>({});
 
   const fetchRecords = async () => {
     try {
@@ -42,13 +49,24 @@ export default function PatientHistoryPage() {
   };
 
   useEffect(() => { fetchRecords(); }, [id]);
+  useEffect(() => { getLabUsers().then((res) => setLabUsers(res.data)).catch(() => {}); }, []);
 
   const toggle = (rid: number) =>
-    setExpanded((prev: number[]) => prev.includes(rid) ? prev.filter((x) => x !== rid) : [...prev, rid]);
+    setExpanded((prev) => prev.includes(rid) ? prev.filter((x) => x !== rid) : [...prev, rid]);
 
-  const fetchFiles = async (recordId: number) => {
-    const res = await getRecordTestFilesAsDoctor(recordId);
-    setFilesByRecord((prev) => ({ ...prev, [recordId]: res.data }));
+  const handleCreateRecord = async () => {
+    setCreatingRecord(true);
+    try {
+      await createPatientRecord(parseInt(id), { summary: newRecordSummary || undefined });
+      setNewRecordModal(false);
+      setNewRecordSummary("");
+      fetchRecords();
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { detail?: string } } };
+      alert(e?.response?.data?.detail || "Failed to create record");
+    } finally {
+      setCreatingRecord(false);
+    }
   };
 
   const handleSaveReport = async () => {
@@ -71,15 +89,20 @@ export default function PatientHistoryPage() {
     <div style={{ minHeight: "100vh" }}>
       <Navbar />
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Patient <span className="gradient-text">History</span></h1>
-        <p className="mb-8" style={{ color: "var(--text-secondary)" }}>View and append reports to patient&apos;s medical records</p>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-3xl font-bold">Patient <span className="gradient-text">History</span></h1>
+          <button className="btn-primary" onClick={() => setNewRecordModal(true)}>
+            <Plus size={15} /> New Record
+          </button>
+        </div>
+        <p className="mb-8" style={{ color: "var(--text-secondary)" }}>View and manage patient medical records</p>
 
         {loading ? (
           <p style={{ color: "var(--text-secondary)" }}>Loading…</p>
         ) : records.length === 0 ? (
           <div className="glass p-12 text-center">
             <FileText size={40} style={{ margin: "0 auto 1rem", color: "var(--text-secondary)" }} />
-            <p style={{ color: "var(--text-secondary)" }}>No records for this patient.</p>
+            <p style={{ color: "var(--text-secondary)" }}>No records yet. Create one to get started.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -104,21 +127,15 @@ export default function PatientHistoryPage() {
 
                 {expanded.includes(rec.id) && (
                   <div className="px-5 pb-5 space-y-4">
-                    <div
-                      className="inline-flex items-center gap-1 p-1 rounded-xl"
-                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}
-                    >
+                    <div className="inline-flex items-center gap-1 p-1 rounded-xl"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}>
                       {(["diagnostics", "labs"] as const).map((tab) => {
                         const active = (activeTabByRecord[rec.id] ?? "diagnostics") === tab;
                         return (
-                          <button
-                            key={tab}
-                            type="button"
+                          <button key={tab} type="button"
                             onClick={() => setActiveTabByRecord((prev) => ({ ...prev, [rec.id]: tab }))}
                             className={"px-3 py-2 text-sm font-semibold transition border-b-3 " +
-                              (active ? "border-accent-light" : "text-text-secondary border-transparent")
-                            }
-                          >
+                              (active ? "border-accent-light" : "text-text-secondary border-transparent")}>
                             {tab === "diagnostics" ? "Diagnostics" : "Lab results"}
                           </button>
                         );
@@ -127,14 +144,9 @@ export default function PatientHistoryPage() {
 
                     {(activeTabByRecord[rec.id] ?? "diagnostics") === "diagnostics" ? (
                       <div className="space-y-4">
-                        <button
-                          id={`add-report-${rec.id}`}
-                          className="btn-primary"
-                          onClick={() => setReportModal({ recordId: rec.id })}
-                        >
+                        <button className="btn-primary" onClick={() => setReportModal({ recordId: rec.id })}>
                           <Plus size={15} /> Add Report
                         </button>
-
                         {rec.reports.length === 0 ? (
                           <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No reports yet.</p>
                         ) : rec.reports.map((rpt) => (
@@ -162,23 +174,21 @@ export default function PatientHistoryPage() {
                     ) : (
                       <div className="p-4 rounded-xl"
                         style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)" }}>
-                        <p className="font-bold mb-2">Lab test results</p>
+                        <p className="font-bold mb-3">Lab test results</p>
                         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
                           <div className="flex-1">
-                            <label className="text-sm">Lab uploader user id</label>
-                            <input
-                              className="input"
-                              placeholder="e.g. 12"
-                              value={labUserId}
-                              onChange={(e) => setLabUserId(e.target.value)}
-                            />
+                            <label className="text-sm">Lab uploader</label>
+                            <select className="input" value={labUserId} onChange={(e) => setLabUserId(e.target.value)}>
+                              <option value="">Select a lab…</option>
+                              {labUsers.map((u) => (
+                                <option key={u.id} value={u.id}>{u.name}</option>
+                              ))}
+                            </select>
                           </div>
-                          <button
-                            className="btn-secondary"
-                            disabled={!labUserId || assigning === rec.id}
+                          <button className="btn-secondary" disabled={!labUserId || assigning === rec.id}
                             onClick={async () => {
                               const labId = parseInt(labUserId);
-                              if (Number.isNaN(labId)) return alert("Enter a valid lab user id");
+                              if (Number.isNaN(labId)) return alert("Select a lab uploader");
                               setAssigning(rec.id);
                               try {
                                 await createLabAssignment(rec.id, { lab_user_id: labId });
@@ -189,41 +199,27 @@ export default function PatientHistoryPage() {
                               } finally {
                                 setAssigning(null);
                               }
-                            }}
-                          >
+                            }}>
                             <UploadCloud size={15} /> {assigning === rec.id ? "Assigning…" : "Assign lab"}
                           </button>
-                          <button
-                            className="btn-ghost px-3.5 py-2"
-                            onClick={() => fetchFiles(rec.id)}
-                            style={{ border: "1px solid var(--border)" }}
-                          >
-                            Refresh files
-                          </button>
                         </div>
-
                         <div className="mt-4">
-                          {(filesByRecord[rec.id] || []).length === 0 ? (
-                            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                              No uploaded test files yet.
-                            </p>
+                          {rec.test_result_files.length === 0 ? (
+                            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No uploaded test files yet.</p>
                           ) : (
                             <div className="space-y-2">
-                              {(filesByRecord[rec.id] || []).map((f: TestFile) => (
+                              {rec.test_result_files.map((f) => (
                                 <div key={f.id} className="flex items-center justify-between gap-3 p-3 rounded-lg"
                                   style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--border)" }}>
                                   <div className="min-w-0">
                                     <p className="font-semibold text-sm truncate">{f.original_filename}</p>
                                     <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
-                                      {new Date(f.created_at).toLocaleString()} · {(f.size_bytes / 1024).toFixed(1)} KB · {f.hash_algo}
+                                      {new Date(f.created_at).toLocaleString()} · {(f.size_bytes / 1024).toFixed(1)} KB
                                     </p>
                                   </div>
-                                  <a
-                                    className="btn-secondary"
+                                  <a className="btn-secondary"
                                     href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/files/${f.id}/download`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
+                                    target="_blank" rel="noreferrer">
                                     Download
                                   </a>
                                 </div>
@@ -237,6 +233,33 @@ export default function PatientHistoryPage() {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* New Record Modal */}
+        {newRecordModal && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4"
+            style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+            <div className="glass p-6 w-full max-w-md">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg">New Medical Record</h3>
+                <button onClick={() => setNewRecordModal(false)}
+                  style={{ background: "none", border: "none", color: "var(--text-secondary)", cursor: "pointer" }}>
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label>Summary / Reason for visit</label>
+                  <input className="input" placeholder="e.g. Follow-up for hypertension"
+                    value={newRecordSummary} onChange={(e) => setNewRecordSummary(e.target.value)} />
+                </div>
+                <button className="btn-primary w-full justify-center"
+                  disabled={creatingRecord} onClick={handleCreateRecord}>
+                  {creatingRecord ? "Creating…" : "Create Record"}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -255,22 +278,22 @@ export default function PatientHistoryPage() {
               <div className="space-y-4">
                 <div>
                   <label>Notes / Findings</label>
-                  <textarea id="report-content" className="input" rows={4} style={{ resize: "none" }}
+                  <textarea className="input" rows={4} style={{ resize: "none" }}
                     placeholder="Clinical notes…" value={form.content}
                     onChange={(e) => setForm({ ...form, content: e.target.value })} />
                 </div>
                 <div>
                   <label>Diagnosis</label>
-                  <input id="report-diagnosis" type="text" className="input" placeholder="e.g. Hypertension Stage 1"
+                  <input type="text" className="input" placeholder="e.g. Hypertension Stage 1"
                     value={form.diagnosis} onChange={(e) => setForm({ ...form, diagnosis: e.target.value })} />
                 </div>
                 <div>
                   <label>Prescription</label>
-                  <textarea id="report-prescription" className="input" rows={2} style={{ resize: "none" }}
+                  <textarea className="input" rows={2} style={{ resize: "none" }}
                     placeholder="Medications, dosage…" value={form.prescription}
                     onChange={(e) => setForm({ ...form, prescription: e.target.value })} />
                 </div>
-                <button id="save-report-btn" className="btn-primary w-full justify-center"
+                <button className="btn-primary w-full justify-center"
                   disabled={!form.content || saving} onClick={handleSaveReport}>
                   {saving ? "Saving…" : "Save Report"}
                 </button>

@@ -58,44 +58,6 @@ class AppointmentOut(BaseModel):
         from_attributes = True
 
 
-# ─── Medical Records ─────────────────────────────────────────────────────────
-
-class ReportCreate(BaseModel):
-    content: str
-    diagnosis: Optional[str] = None
-    prescription: Optional[str] = None
-
-
-class ReportOut(BaseModel):
-    id: int
-    record_id: int
-    doctor_id: int
-    content: str
-    diagnosis: Optional[str] = None
-    prescription: Optional[str] = None
-    created_at: datetime
-    doctor: Optional[UserOut] = None
-
-    class Config:
-        from_attributes = True
-
-
-class MedicalRecordOut(BaseModel):
-    id: int
-    patient_id: int
-    summary: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
-    reports: List[ReportOut] = []
-
-    class Config:
-        from_attributes = True
-
-
-class MedicalRecordCreate(BaseModel):
-    summary: Optional[str] = None
-
-
 # ─── Lab Upload Assignments & Test Result Files ───────────────────────────────
 
 class LabUploadAssignmentCreate(BaseModel):
@@ -133,3 +95,43 @@ class TestResultFileOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ─── Medical Records ─────────────────────────────────────────────────────────
+
+class ReportCreate(BaseModel):
+    content: str
+    diagnosis: Optional[str] = None
+    prescription: Optional[str] = None
+
+
+class ReportOut(BaseModel):
+    id: int
+    record_id: int
+    doctor_id: int
+    content: str
+    diagnosis: Optional[str] = None
+    prescription: Optional[str] = None
+    created_at: datetime
+    doctor: Optional[UserOut] = None
+
+    class Config:
+        from_attributes = True
+
+
+class MedicalRecordOut(BaseModel):
+    id: int
+    patient_id: int
+    appointment_id: Optional[int] = None
+    summary: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    reports: List[ReportOut] = []
+    test_result_files: List[TestResultFileOut] = []
+
+    class Config:
+        from_attributes = True
+
+
+class MedicalRecordCreate(BaseModel):
+    summary: Optional[str] = None

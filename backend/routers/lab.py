@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 import auth
+import crypto
 import models
 import schemas
 from database import get_db
@@ -93,6 +94,8 @@ def upload_test_result(
                 h.update(chunk)
                 size_bytes += len(chunk)
         os.replace(tmp_path, final_path)
+        crypto.encrypt_file(final_path, final_path + ".enc")
+        os.replace(final_path + ".enc", final_path)
     except Exception:
         try:
             if os.path.exists(tmp_path):

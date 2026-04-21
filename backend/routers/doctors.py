@@ -41,6 +41,27 @@ def confirm_appointment(
     return appt
 
 
+@router.post("/patients/{patient_id}/records", response_model=schemas.MedicalRecordOut, status_code=201)
+def create_patient_record(
+    patient_id: int,
+    payload: schemas.MedicalRecordCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_doctor),
+):
+    has_appointment = db.query(models.Appointment).filter(
+        models.Appointment.doctor_id == current_user.id,
+        models.Appointment.patient_id == patient_id,
+    ).first()
+    if not has_appointment:
+        raise HTTPException(status_code=403, detail="No appointment with this patient")
+
+    record = models.MedicalRecord(patient_id=patient_id, summary=payload.summary)
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
 @router.get("/patients/{patient_id}/records", response_model=List[schemas.MedicalRecordOut])
 def patient_records(
     patient_id: int,
@@ -192,6 +213,15 @@ def list_test_files(
         .order_by(models.TestResultFile.created_at.desc())
         .all()
     )
+
+
+@router.get("/lab-users", response_model=List[schemas.UserOut])
+def list_lab_users(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_doctor),
+):
+    """Return all lab users so the doctor can pick one when creating an assignment."""
+    return db.query(models.User).filter(models.User.role == models.RoleEnum.lab).all()
 
 
 @router.get("/patients", response_model=List[schemas.UserOut])

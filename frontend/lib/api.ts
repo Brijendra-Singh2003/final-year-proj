@@ -46,11 +46,14 @@ export const confirmAppointment = (id: number) =>
     api.patch(`/doctors/appointments/${id}/confirm`);
 export const getPatientRecords = (patientId: number) =>
     api.get(`/doctors/patients/${patientId}/records`);
+export const createPatientRecord = (patientId: number, data: { summary?: string }) =>
+    api.post(`/doctors/patients/${patientId}/records`, data);
 export const appendReport = (
     recordId: number,
     data: { content: string; diagnosis?: string; prescription?: string }
 ) => api.post(`/doctors/records/${recordId}/reports`, data);
 export const getMyPatients = () => api.get("/doctors/patients");
+export const getLabUsers = () => api.get("/doctors/lab-users");
 
 export const createLabAssignment = (
     recordId: number,

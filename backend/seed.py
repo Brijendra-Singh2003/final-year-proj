@@ -61,9 +61,6 @@ for u in users:
         )
         db.add(user)
         db.flush()
-        if u["role"] == "patient":
-            record = models.MedicalRecord(patient_id=user.id, summary="Initial record")
-            db.add(record)
 
 db.commit()
 db.close()
