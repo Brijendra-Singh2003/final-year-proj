@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
-from models import RoleEnum, AppointmentStatus
+from models import RoleEnum, AppointmentStatus, LabUploadAssignmentStatus
 
 
 # ─── Auth ────────────────────────────────────────────────────────────────────
@@ -58,6 +58,45 @@ class AppointmentOut(BaseModel):
         from_attributes = True
 
 
+# ─── Lab Upload Assignments & Test Result Files ───────────────────────────────
+
+class LabUploadAssignmentCreate(BaseModel):
+    lab_user_id: int
+    expires_at: Optional[datetime] = None
+
+
+class LabUploadAssignmentOut(BaseModel):
+    id: int
+    record_id: int
+    patient_id: int
+    doctor_id: int
+    lab_user_id: int
+    status: LabUploadAssignmentStatus
+    created_at: datetime
+    expires_at: Optional[datetime] = None
+    consumed_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class TestResultFileOut(BaseModel):
+    id: int
+    assignment_id: int
+    record_id: int
+    patient_id: int
+    uploaded_by_user_id: int
+    original_filename: str
+    content_type: Optional[str] = None
+    size_bytes: int
+    hash_algo: str
+    hash_hex: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 # ─── Medical Records ─────────────────────────────────────────────────────────
 
 class ReportCreate(BaseModel):
@@ -83,10 +122,12 @@ class ReportOut(BaseModel):
 class MedicalRecordOut(BaseModel):
     id: int
     patient_id: int
+    appointment_id: Optional[int] = None
     summary: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     reports: List[ReportOut] = []
+    test_result_files: List[TestResultFileOut] = []
 
     class Config:
         from_attributes = True

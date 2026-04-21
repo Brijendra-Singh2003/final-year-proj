@@ -1,5 +1,5 @@
 """
-Seed script: creates sample admin, doctors, and patients.
+Seed script: creates sample admin, doctors, lab uploader, and patients.
 Run with: cd backend && python seed.py
 """
 import sys
@@ -34,6 +34,11 @@ users = [
         "phone": "+91 9800000003",
     },
     {
+        "name": "Apex Diagnostics", "email": "lab@medconnect.com",
+        "password": "lab123", "role": "lab",
+        "phone": "+91 9600000001",
+    },
+    {
         "name": "Ravi Kumar", "email": "ravi@medconnect.com",
         "password": "patient123", "role": "patient", "phone": "+91 9700000001",
     },
@@ -56,9 +61,6 @@ for u in users:
         )
         db.add(user)
         db.flush()
-        if u["role"] == "patient":
-            record = models.MedicalRecord(patient_id=user.id, summary="Initial record")
-            db.add(record)
 
 db.commit()
 db.close()
@@ -67,5 +69,6 @@ print("   Admin:    admin@medconnect.com / admin123")
 print("   Doctors:  priya@medconnect.com / doctor123")
 print("             arjun@medconnect.com / doctor123")
 print("             sunita@medconnect.com / doctor123")
+print("   Lab:      lab@medconnect.com / lab123")
 print("   Patients: ravi@medconnect.com / patient123")
 print("             anita@medconnect.com / patient123")
