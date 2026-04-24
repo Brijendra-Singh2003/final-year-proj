@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
-import models, schemas, auth
+import models, schemas, auth, audit
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 
@@ -27,6 +27,7 @@ def search_doctors(
 @router.post("/appointments", response_model=schemas.AppointmentOut, status_code=201)
 def book_appointment(
     payload: schemas.AppointmentCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_patient),
 ):
@@ -57,6 +58,9 @@ def book_appointment(
     db.add(appt)
     db.commit()
     db.refresh(appt)
+    audit.log(db, "appointment.booked", user_id=current_user.id, resource_type="appointment",
+              resource_id=appt.id, details=f"doctor_id={payload.doctor_id} date={payload.date} slot={payload.time_slot}",
+              ip_address=request.client.host if request.client else None)
     return appt
 
 
@@ -76,6 +80,7 @@ def my_appointments(
 @router.patch("/appointments/{appt_id}/cancel", response_model=schemas.AppointmentOut)
 def cancel_appointment(
     appt_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_patient),
 ):
@@ -90,14 +95,19 @@ def cancel_appointment(
     appt.status = models.AppointmentStatus.cancelled
     db.commit()
     db.refresh(appt)
+    audit.log(db, "appointment.cancelled", user_id=current_user.id, resource_type="appointment",
+              resource_id=appt_id, ip_address=request.client.host if request.client else None)
     return appt
 
 
 @router.get("/records", response_model=List[schemas.MedicalRecordOut])
 def my_records(
+    request: Request,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_patient),
 ):
+    audit.log(db, "records.viewed", user_id=current_user.id, resource_type="patient",
+              resource_id=current_user.id, ip_address=request.client.host if request.client else None)
     return (
         db.query(models.MedicalRecord)
         .filter(models.MedicalRecord.patient_id == current_user.id)

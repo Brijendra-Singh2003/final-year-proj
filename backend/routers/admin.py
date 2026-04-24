@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-import models, schemas, auth
+import models, schemas, auth, audit
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -20,6 +20,7 @@ def list_users(
 @router.delete("/users/{user_id}", status_code=204)
 def delete_user(
     user_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_admin),
 ):
@@ -28,6 +29,9 @@ def delete_user(
         raise HTTPException(status_code=404, detail="User not found")
     if user.id == current_user.id: # type: ignore
         raise HTTPException(status_code=400, detail="Cannot delete yourself")
+    audit.log(db, "admin.user_deleted", user_id=current_user.id, resource_type="user",
+              resource_id=user_id, details=f"deleted_email={user.email} role={user.role}",
+              ip_address=request.client.host if request.client else None)
     db.delete(user)
     db.commit()
 
@@ -46,3 +50,12 @@ def all_records(
     current_user: models.User = Depends(require_admin),
 ):
     return db.query(models.MedicalRecord).all()
+
+
+@router.get("/audit-logs/verify")
+def verify_audit_chain(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_admin),
+):
+    valid, broken_id = audit.verify_chain(db)
+    return {"valid": valid, "first_broken_id": broken_id}

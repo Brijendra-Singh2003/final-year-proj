@@ -185,3 +185,21 @@ class TestResultFile(Base):
     uploaded_by = relationship(
         "User", foreign_keys=[uploaded_by_user_id], back_populates="test_result_files_uploaded"
     )
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    action = Column(String, nullable=False, index=True)
+    resource_type = Column(String, nullable=True)
+    resource_id = Column(Integer, nullable=True)
+    details = Column(Text, nullable=True)
+    ip_address = Column(String, nullable=True)
+    user_agent = Column(String, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    prev_hash = Column(String, nullable=True)
+    row_hash = Column(String, nullable=False, index=True)
+
+    user = relationship("User", foreign_keys=[user_id])
