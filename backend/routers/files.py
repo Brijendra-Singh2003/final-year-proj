@@ -4,6 +4,7 @@ import tempfile
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 from sqlalchemy.orm import Session
 
 import auth
@@ -72,7 +73,7 @@ def download_file(
             path=tmp.name,
             media_type=f.content_type or "application/octet-stream",
             filename=f.original_filename,
-            background=None,
+            background=BackgroundTask(os.unlink, tmp.name),
         )
     except Exception:
         os.unlink(tmp.name)
