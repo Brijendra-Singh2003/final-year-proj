@@ -1,8 +1,22 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import TypeDecorator
 from datetime import datetime
 import enum
+import crypto
 from database import Base
+
+
+class EncryptedText(TypeDecorator):
+    """Transparently encrypts/decrypts text columns using AES-256-GCM."""
+    impl = Text
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        return crypto.encrypt_text(value) if value is not None else value
+
+    def process_result_value(self, value, dialect):
+        return crypto.decrypt_text(value) if value is not None else value
 
 
 class RoleEnum(str, enum.Enum):
@@ -72,7 +86,7 @@ class Appointment(Base):
     date = Column(String, nullable=False)        # "YYYY-MM-DD"
     time_slot = Column(String, nullable=False)   # "09:00 AM"
     status = Column(Enum(AppointmentStatus), default=AppointmentStatus.pending)
-    notes = Column(Text, nullable=True)
+    notes = Column(EncryptedText, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     patient = relationship("User", foreign_keys=[patient_id], back_populates="appointments_as_patient")
@@ -86,7 +100,7 @@ class MedicalRecord(Base):
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=True, unique=True)
-    summary = Column(Text, nullable=True)
+    summary = Column(EncryptedText, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -107,9 +121,9 @@ class Report(Base):
     id = Column(Integer, primary_key=True, index=True)
     record_id = Column(Integer, ForeignKey("medical_records.id"), nullable=False)
     doctor_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    content = Column(Text, nullable=False)
-    diagnosis = Column(String, nullable=True)
-    prescription = Column(Text, nullable=True)
+    content = Column(EncryptedText, nullable=False)
+    diagnosis = Column(EncryptedText, nullable=True)
+    prescription = Column(EncryptedText, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     record = relationship("MedicalRecord", back_populates="reports")
@@ -171,3 +185,21 @@ class TestResultFile(Base):
     uploaded_by = relationship(
         "User", foreign_keys=[uploaded_by_user_id], back_populates="test_result_files_uploaded"
     )
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    action = Column(String, nullable=False, index=True)
+    resource_type = Column(String, nullable=True)
+    resource_id = Column(Integer, nullable=True)
+    details = Column(Text, nullable=True)
+    ip_address = Column(String, nullable=True)
+    user_agent = Column(String, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    prev_hash = Column(String, nullable=True)
+    row_hash = Column(String, nullable=False, index=True)
+
+    user = relationship("User", foreign_keys=[user_id])

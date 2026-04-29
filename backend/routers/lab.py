@@ -3,10 +3,11 @@ import uuid
 import hashlib
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+import audit
 import auth
 import crypto
 import models
@@ -43,6 +44,7 @@ def my_assignments(
 )
 def upload_test_result(
     assignment_id: int,
+    request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_lab),
@@ -128,5 +130,8 @@ def upload_test_result(
         raise HTTPException(status_code=409, detail="This assignment already has an uploaded file")
 
     db.refresh(test_file)
+    audit.log(db, "file.uploaded", user_id=current_user.id, resource_type="test_result_file",
+              resource_id=test_file.id, details=f"assignment_id={assignment_id} patient_id={assignment.patient_id}",
+              ip_address=request.client.host if request.client else None)
     return test_file
 

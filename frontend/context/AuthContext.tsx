@@ -9,13 +9,14 @@ import {
 import { getMe, logout as apiLogout } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
-interface User {
+export interface User {
   id: number;
   name: string;
   email: string;
-  role: "patient" | "doctor" | "admin";
+  role: "patient" | "doctor" | "admin" | "lab";
   specialty?: string;
   phone?: string;
+  created_at: string;
 }
 
 interface AuthContextType {

@@ -19,8 +19,8 @@ const NAV_LINKS = {
     { href: "/lab/assignments",  label: "Assignments", icon: FileText },
   ],
   admin: [
-    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/users",     label: "Users",     icon: Users },
+    // { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    // { href: "/admin/users",     label: "Users",     icon: Users },
   ],
 };
 
@@ -32,11 +32,11 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-border shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
-      <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-16">
+      <div className="max-w-300 mx-auto px-6 flex items-center justify-between h-16">
 
         {/* Logo */}
         <Link href={`/${user.role}/dashboard`} className="flex items-center gap-2.5 no-underline">
-          <div className="bg-accent-subtle border border-accent-medium p-1.5 rounded-[10px]">
+          <div className="bg-accent-subtle border border-accent-medium p-1.5 rounded-btn">
             <Activity size={20} className="text-accent" />
           </div>
           <span className="gradient-text font-extrabold text-lg font-display">MedConnect</span>

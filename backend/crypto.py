@@ -33,3 +33,19 @@ def decrypt_file(src_path: str, dest_path: str) -> None:
     plaintext = aesgcm.decrypt(nonce, ciphertext, None)
     with open(dest_path, "wb") as f:
         f.write(plaintext)
+
+
+def encrypt_text(plaintext: str) -> str:
+    """Encrypt a string with AES-256-GCM, return base64-encoded nonce+ciphertext."""
+    key = _get_key()
+    nonce = os.urandom(12)
+    ciphertext = AESGCM(key).encrypt(nonce, plaintext.encode(), None)
+    return base64.urlsafe_b64encode(nonce + ciphertext).decode()
+
+
+def decrypt_text(token: str) -> str:
+    """Decrypt a base64-encoded nonce+ciphertext string."""
+    key = _get_key()
+    data = base64.urlsafe_b64decode(token)
+    nonce, ciphertext = data[:12], data[12:]
+    return AESGCM(key).decrypt(nonce, ciphertext, None).decode()

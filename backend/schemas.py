@@ -1,7 +1,14 @@
-from pydantic import BaseModel, EmailStr
+import re
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List
 from datetime import datetime
 from models import RoleEnum, AppointmentStatus, LabUploadAssignmentStatus
+
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_TIME_RE = re.compile(r"^(0[1-9]|1[0-2]):[0-5]\d (AM|PM)$")
+
+# Roles that cannot be self-registered
+_RESTRICTED_ROLES = {RoleEnum.admin, RoleEnum.lab}
 
 
 # ─── Auth ────────────────────────────────────────────────────────────────────
@@ -13,6 +20,20 @@ class UserRegister(BaseModel):
     role: RoleEnum = RoleEnum.patient
     specialty: Optional[str] = None
     phone: Optional[str] = None
+
+    @field_validator("role")
+    @classmethod
+    def role_not_restricted(cls, v: RoleEnum) -> RoleEnum:
+        if v in _RESTRICTED_ROLES:
+            raise ValueError("Cannot self-register with this role")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
 
 
 class UserLogin(BaseModel):
@@ -40,6 +61,24 @@ class AppointmentCreate(BaseModel):
     date: str          # "YYYY-MM-DD"
     time_slot: str     # "09:00 AM"
     notes: Optional[str] = None
+
+    @field_validator("date")
+    @classmethod
+    def validate_date(cls, v: str) -> str:
+        if not _DATE_RE.match(v):
+            raise ValueError("date must be in YYYY-MM-DD format")
+        try:
+            datetime.strptime(v, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError("date is not a valid calendar date")
+        return v
+
+    @field_validator("time_slot")
+    @classmethod
+    def validate_time_slot(cls, v: str) -> str:
+        if not _TIME_RE.match(v):
+            raise ValueError("time_slot must be in HH:MM AM/PM format, e.g. 09:00 AM")
+        return v
 
 
 class AppointmentOut(BaseModel):

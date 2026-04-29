@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
-import models, schemas, auth
+import models, schemas, auth, audit
 from datetime import datetime
 
 router = APIRouter(prefix="/doctors", tags=["doctors"])
@@ -26,6 +26,7 @@ def my_appointments(
 @router.patch("/appointments/{appt_id}/confirm", response_model=schemas.AppointmentOut)
 def confirm_appointment(
     appt_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
@@ -38,6 +39,8 @@ def confirm_appointment(
     appt.status = models.AppointmentStatus.confirmed
     db.commit()
     db.refresh(appt)
+    audit.log(db, "appointment.confirmed", user_id=current_user.id, resource_type="appointment",
+              resource_id=appt_id, ip_address=request.client.host if request.client else None)
     return appt
 
 
@@ -65,6 +68,7 @@ def create_patient_record(
 @router.get("/patients/{patient_id}/records", response_model=List[schemas.MedicalRecordOut])
 def patient_records(
     patient_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
@@ -76,6 +80,8 @@ def patient_records(
     if not has_appointment:
         raise HTTPException(status_code=403, detail="No appointment with this patient")
 
+    audit.log(db, "records.viewed", user_id=current_user.id, resource_type="patient",
+              resource_id=patient_id, ip_address=request.client.host if request.client else None)
     records = db.query(models.MedicalRecord).filter(
         models.MedicalRecord.patient_id == patient_id
     ).all()
@@ -86,6 +92,7 @@ def patient_records(
 def append_report(
     record_id: int,
     payload: schemas.ReportCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
@@ -111,6 +118,9 @@ def append_report(
     db.add(report)
     db.commit()
     db.refresh(report)
+    audit.log(db, "report.created", user_id=current_user.id, resource_type="report",
+              resource_id=report.id, details=f"record_id={record_id} patient_id={record.patient_id}",
+              ip_address=request.client.host if request.client else None)
     return report
 
 
