@@ -1,42 +1,51 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
-import { getAllUsers, deleteUser } from "@/lib/api";
-import { Users, Trash2, ShieldCheck } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { getAllUsers, deleteUser, getAllAppointments, getAdminStats } from "@/lib/api";
+import { BarChart3, Users, CalendarDays, ScrollText } from "lucide-react";
+import { useAuth, User } from "@/context/AuthContext";
+import OverviewTab from "./OverviewTab";
+import UsersTab from "./UsersTab";
+import AppointmentsTab from "./AppointmentsTab";
+import AuditLogsTab from "./AuditLogsTab";
 
-interface User { id: number; name: string; email: string; role: string; specialty?: string; phone?: string; created_at: string; }
+interface Appointment { id: number; patient_id: number; doctor_id: number; date: string; time_slot: string; status: string; patient?: User; doctor?: User; }
+interface Stats {
+  users: Record<string, number>;
+  appointments: { total: number; pending: number; confirmed: number; cancelled: number };
+  records: number; reports: number; lab_assignments: number; audit_logs: number;
+}
+
+const TABS = ["Overview", "Users", "Appointments", "Audit Logs"] as const;
+type Tab = typeof TABS[number];
+const TAB_ICONS = { Overview: BarChart3, Users: Users, Appointments: CalendarDays, "Audit Logs": ScrollText };
 
 export default function AdminDashboard() {
   const { user: me } = useAuth();
+  const [activeTab, setActiveTab] = useState<Tab>("Overview");
   const [users, setUsers] = useState<User[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
 
-  const fetchUsers = async () => {
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
     try {
-      const res = await getAllUsers();
-      setUsers(res.data);
+      const [u, a, s] = await Promise.all([getAllUsers(), getAllAppointments(), getAdminStats()]);
+      setUsers(u.data);
+      setAppointments(a.data);
+      setStats(s.data);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const handleDelete = async (id: number, name: string) => {
     if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
     await deleteUser(id);
-    fetchUsers();
-  };
-
-  const filtered = filter === "all" ? users : users.filter((u) => u.role === filter);
-
-  const counts = {
-    all: users.length,
-    patient: users.filter((u) => u.role === "patient").length,
-    doctor: users.filter((u) => u.role === "doctor").length,
-    admin: users.filter((u) => u.role === "admin").length,
+    fetchAll();
   };
 
   return (
@@ -44,92 +53,35 @@ export default function AdminDashboard() {
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-1">
-            Admin <span className="gradient-text">Dashboard</span>
-          </h1>
-          <p style={{ color: "var(--text-secondary)" }}>Manage all users on the platform</p>
+          <h1 className="text-3xl font-bold mb-1">Admin <span className="gradient-text">Dashboard</span></h1>
+          <p style={{ color: "var(--text-secondary)" }}>Platform overview and management</p>
         </div>
 
-        {/* Stat cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: "Total Users", value: counts.all, color: "#3b82f6" },
-            { label: "Patients", value: counts.patient, color: "#10b981" },
-            { label: "Doctors", value: counts.doctor, color: "#a78bfa" },
-            { label: "Admins", value: counts.admin, color: "#fb7185" },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="stat-card">
-              <p className="text-2xl font-bold" style={{ color }}>{value}</p>
-              <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{label}</p>
-            </div>
-          ))}
+        {/* Tabs */}
+        <div className="flex gap-1 mb-6" style={{ borderBottom: "1px solid var(--border)" }}>
+          {TABS.map((tab) => {
+            const Icon = TAB_ICONS[tab];
+            return (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                className={"flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 "
+                  + (activeTab === tab ? "text-accent-dark border-accent " : "border-transparent")
+                }>
+                <Icon size={15} /> {tab}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 mb-4">
-          {["all", "patient", "doctor", "admin"].map((r) => (
-            <button key={r} onClick={() => setFilter(r)}
-              className="btn-ghost"
-              style={{
-                padding: "0.4rem 1rem",
-                background: filter === r ? "var(--accent-glow)" : undefined,
-                borderColor: filter === r ? "var(--accent)" : undefined,
-                color: filter === r ? "var(--accent-light)" : undefined,
-              }}>
-              {r.charAt(0).toUpperCase() + r.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Users table */}
-        <div className="glass p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Users size={20} style={{ color: "var(--accent)" }} />
-            <h2 className="text-lg font-bold">
-              {filter === "all" ? "All Users" : `${filter.charAt(0).toUpperCase() + filter.slice(1)}s`}
-            </h2>
-          </div>
-
-          {loading ? (
-            <p style={{ color: "var(--text-secondary)" }}>Loading…</p>
-          ) : (
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr><th>Name</th><th>Email</th><th>Role</th><th>Specialty</th><th>Joined</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                  {filtered.map((u) => (
-                    <tr key={u.id}>
-                      <td style={{ fontWeight: 600, color: "var(--text-primary)" }}>
-                        {u.name}
-                        {u.id === me?.id && (
-                          <span className="ml-2 badge badge-admin" style={{ fontSize: "0.6rem" }}>You</span>
-                        )}
-                      </td>
-                      <td>{u.email}</td>
-                      <td><span className={`badge badge-${u.role}`}>{u.role}</span></td>
-                      <td>{u.specialty || "—"}</td>
-                      <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                      <td>
-                        {u.id !== me?.id ? (
-                          <button id={`delete-user-${u.id}`} onClick={() => handleDelete(u.id, u.name)} className="btn-danger"
-                            style={{ padding: "0.3rem 0.7rem", fontSize: "0.75rem" }}>
-                            <Trash2 size={13} /> Delete
-                          </button>
-                        ) : (
-                          <span className="flex items-center gap-1 text-xs" style={{ color: "var(--text-secondary)" }}>
-                            <ShieldCheck size={13} /> Protected
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        {loading && activeTab !== "Audit Logs" ? (
+          <p style={{ color: "var(--text-secondary)" }}>Loading…</p>
+        ) : (
+          <>
+            {activeTab === "Overview" && <OverviewTab stats={stats} />}
+            {activeTab === "Users" && <UsersTab users={users} me={me} onDelete={handleDelete} />}
+            {activeTab === "Appointments" && <AppointmentsTab appointments={appointments} />}
+            {activeTab === "Audit Logs" && <AuditLogsTab />}
+          </>
+        )}
       </main>
     </div>
   );

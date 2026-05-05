@@ -31,8 +31,9 @@ export default function RegisterPage() {
       });
       router.push("/login?registered=1");
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { detail?: string } } };
-      setError(e?.response?.data?.detail || "Registration failed");
+      const e = err as { response?: { data?: { detail?: string | { msg: string }[] } } };
+      const detail = e?.response?.data?.detail;
+      setError(Array.isArray(detail) ? detail.map((d) => d.msg).join(", ") : detail || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -84,7 +85,7 @@ export default function RegisterPage() {
             <label>Full Name</label>
             <div className="relative">
               <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-              <input id="name" type="text" required className="input" style={{ paddingLeft: "2.5rem" }}
+              <input id="name" type="text" required className="input pl-10" style={{ paddingLeft: "2.5rem" }}
                 placeholder="Jane Smith" value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
@@ -130,7 +131,7 @@ export default function RegisterPage() {
             <div className="relative">
               <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
               <input id="register-password" type="password" required className="input" style={{ paddingLeft: "2.5rem" }}
-                placeholder="Min 6 characters" minLength={6} value={form.password}
+                placeholder="Min 8 characters" minLength={8} value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })} />
             </div>
           </div>

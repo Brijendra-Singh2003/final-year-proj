@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Activity, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { login } from "@/lib/api";
@@ -13,6 +13,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { refresh } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const registered = searchParams.get("registered") === "1";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,8 +26,9 @@ export default function LoginPage() {
       const role = res.data.user.role;
       router.push(`/${role}/dashboard`);
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { detail?: string } } };
-      setError(e?.response?.data?.detail || "Login failed");
+      const e = err as { response?: { data?: { detail?: string | { msg: string }[] } } };
+      const detail = e?.response?.data?.detail;
+      setError(Array.isArray(detail) ? detail.map((d) => d.msg).join(", ") : detail || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -48,6 +51,12 @@ export default function LoginPage() {
 
         <h2 className="font-extrabold text-2xl text-text-primary mb-1 font-display">Welcome back 👋</h2>
         <p className="text-text-secondary text-sm mb-7">Sign in to access your health dashboard</p>
+
+        {registered && (
+          <div className="mb-5 px-4 py-3 rounded-xl text-sm bg-green-50 text-green-700 border border-green-200">
+            Account created! Please sign in.
+          </div>
+        )}
 
         {error && (
           <div className="mb-5 px-4 py-3 rounded-xl text-sm bg-red-50 text-danger border border-red-200">
