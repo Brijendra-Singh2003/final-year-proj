@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:mobile/features/authentication/data/models/auth_response.dart';
+import 'package:mobile/features/authentication/data/models/user_model.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_endpoints.dart';
 /* import 'models/auth_response_model.dart'; */
@@ -9,27 +9,45 @@ class AuthApi {
 
   Future<AuthResponse> login(String email, String password) async {
     final response = await _client.dio.post(
-      ApiEndpoints.login,
-      data: {
-        "email": email,
-        "password": password,
-      },
+      "/auth/login",
+      data: {"email": email, "password": password},
     );
-
+    print("FULL LOGIN RESPONSE: ${response.data}");
     return AuthResponse.fromJson(response.data);
   }
-  Future<AuthResponse> signup(
-  String email,
-  String password,
-) async {
+
+  Future<UserModel> signup({
+  required String name,
+  required String email,
+  required String password,
+  required String phone,
+}) async {
+
+  // 🔥 PRINT REQUEST (VERY IMPORTANT)
+  print("SIGNUP REQUEST DATA: ${{
+    "name": name,
+    "email": email,
+    "password": password,
+    "role": "patient",
+    "specialty": "",
+    "phone": phone,
+  }}");
+
   final response = await _client.dio.post(
-    "/auth/signup",
+    "/auth/register",
     data: {
+      "name": name,
       "email": email,
       "password": password,
+      "role": "patient",
+      "specialty": "",
+      "phone": phone,
     },
   );
 
-  return AuthResponse.fromJson(response.data);
+  // 🔥 PRINT RESPONSE
+  print("FULL SIGNUP RESPONSE: ${response.data}");
+
+  return UserModel.fromJson(response.data);
 }
 }

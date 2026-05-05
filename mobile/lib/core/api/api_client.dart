@@ -7,7 +7,7 @@ class ApiClient {
   ApiClient() {
     dio = Dio(
       BaseOptions(
-        baseUrl: "http://your-fastapi-url",
+        baseUrl: "https://patient-management-vku0.onrender.com",
         connectTimeout: const Duration(seconds: 10),
       ),
     );
@@ -23,6 +23,10 @@ class ApiClient {
 
           return handler.next(options);
         },
+        onError:(e, handler){
+          //print("API Error: ${e.message}");
+          return handler.next(e);
+        }
       ),
     );
   }

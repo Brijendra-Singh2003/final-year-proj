@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/features/authentication/presentation/screens/signup_screen.dart';
 import 'package:mobile/features/authentication/presentation/widget/auth_text_field.dart';
-import 'package:mobile/features/patient/presentation/patient_dashboard_screen.dart';
+import 'package:mobile/features/patient/presentation/main_patient_screen.dart';
 import '../../../../riverpod/auth/auth_provider.dart';
 /* import '../widgets/auth_textfield.dart'; */
 
@@ -11,41 +11,43 @@ class LoginScreen extends ConsumerWidget {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
   void _showErrorDialog(BuildContext context, String error) {
-  bool isUserNotFound =
-      error.toLowerCase().contains("not found") ||
-      error.toLowerCase().contains("user does not exist");
+    bool isUserNotFound =
+        error.toLowerCase().contains("not found") ||
+        error.toLowerCase().contains("user does not exist");
 
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text("Login Failed"),
-      content: Text(
-        isUserNotFound
-            ? "User does not exist. Please create an account."
-            : "Incorrect email or password.",
-      ),
-      actions: [
-        if (isUserNotFound)
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => SignupScreen()),
-              );
-            },
-            child: const Text("Signup now"),
-          ),
-
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("OK"),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Login Failed"),
+        content: Text(
+          isUserNotFound
+              ? "User does not exist. Please create an account."
+              : "Incorrect email or password.",
         ),
-      ],
-    ),
-  );
-}
+        actions: [
+          if (isUserNotFound)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => SignupScreen()),
+                );
+              },
+              child: const Text("Signup now"),
+            ),
+
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
@@ -66,29 +68,40 @@ class LoginScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             ElevatedButton(
-              onPressed:authState.isLoading ? null : () {
-                ref.read(authProvider.notifier).login(
-                      emailController.text,
-                      passwordController.text,
-                    );
-                    final updatedState = ref.read(authProvider);
-                    if (updatedState.token != null) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const PatientDashboardScreen(),
-                        ),
-                      );
-                    }
-                      if (updatedState.error != null) {
+  onPressed: authState.isLoading
+      ? null
+      : () async {
+          final email = emailController.text.trim();
+          final password = passwordController.text.trim();
+
+          print("RAW EMAIL: '${emailController.text}'");
+          print("RAW PASSWORD: '${passwordController.text}'");
+          print("TRIMMED EMAIL: '$email'");
+          print("TRIMMED PASSWORD: '$password'");
+
+          // ✅ WAIT for login to complete
+          await ref
+              .read(authProvider.notifier)
+              .login(email, password);
+
+          final updatedState = ref.read(authProvider);
+
+          print("TOKEN: ${updatedState.token}");
+          print("ERROR: ${updatedState.error}");
+
+          if (updatedState.token != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainScreen()),
+            );
+          } else if (updatedState.error != null) {
             _showErrorDialog(context, updatedState.error!);
           }
-        
-              },
-              child: authState.isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text("Login"),
-            ),
+        },
+  child: authState.isLoading
+      ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+      : const Text("Login"),
+),
             const SizedBox(height: 20),
 
             Row(
