@@ -6,9 +6,21 @@ import { Activity, Mail, Lock, User, Phone, Stethoscope, ArrowRight } from "luci
 import { register } from "@/lib/api";
 
 const SPECIALTIES = [
-  "General Practitioner", "Cardiologist", "Dermatologist", "Neurologist",
-  "Orthopedist", "Pediatrician", "Psychiatrist", "Oncologist",
-  "Gynecologist", "Ophthalmologist", "ENT Specialist",
+  "General Practitioner",
+  "Dentist",
+  "Orthopedic Surgeon",
+  "Dermatologist",
+  "Gynecologist",
+  "Pediatrician",
+  "Cardiologist",
+  "Ophthalmologist",
+  "ENT Specialist",
+  "Psychiatrist",
+  "Nutritionist",
+  "Physiotherapist",
+  "Neurologist",
+  "Urologist",
+  "Oncologist",
 ];
 
 export default function RegisterPage() {
