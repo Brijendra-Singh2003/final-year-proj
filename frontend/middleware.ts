@@ -5,13 +5,14 @@ const ROLE_ROUTES: Record<string, string[]> = {
     patient: ["/patient"],
     doctor: ["/doctor"],
     admin: ["/admin"],
+    lab: ["/lab"],
 };
 
 export function middleware(request: NextRequest) {
     const token = request.cookies.get("access_token")?.value;
     const { pathname } = request.nextUrl;
 
-    const protectedPrefixes = ["/patient", "/doctor", "/admin"];
+    const protectedPrefixes = ["/patient", "/doctor", "/admin", "/lab"];
     const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p));
 
     if (isProtected && !token) {
@@ -40,5 +41,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/patient/:path*", "/doctor/:path*", "/admin/:path*"],
+    matcher: ["/patient/:path*", "/doctor/:path*", "/admin/:path*", "/lab/:path*"],
 };

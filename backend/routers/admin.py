@@ -39,18 +39,22 @@ def delete_user(
 
 @router.get("/appointments", response_model=List[schemas.AppointmentOut])
 def all_appointments(
+    skip: int = 0,
+    limit: int = 50,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_admin),
 ):
-    return db.query(models.Appointment).all()
+    return db.query(models.Appointment).offset(skip).limit(limit).all()
 
 
 @router.get("/records", response_model=List[schemas.MedicalRecordOut])
 def all_records(
+    skip: int = 0,
+    limit: int = 50,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_admin),
 ):
-    return db.query(models.MedicalRecord).all()
+    return db.query(models.MedicalRecord).offset(skip).limit(limit).all()
 
 
 @router.get("/audit-logs/verify")

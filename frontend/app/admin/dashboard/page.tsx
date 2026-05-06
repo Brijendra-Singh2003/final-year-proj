@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
-import { getAllUsers, deleteUser, getAllAppointments, getAdminStats } from "@/lib/api";
+import { getAllUsers, deleteUser, getAdminStats } from "@/lib/api";
 import { BarChart3, Users, CalendarDays, ScrollText } from "lucide-react";
 import { useAuth, User } from "@/context/AuthContext";
 import OverviewTab from "./OverviewTab";
@@ -9,7 +9,6 @@ import UsersTab from "./UsersTab";
 import AppointmentsTab from "./AppointmentsTab";
 import AuditLogsTab from "./AuditLogsTab";
 
-interface Appointment { id: number; patient_id: number; doctor_id: number; date: string; time_slot: string; status: string; patient?: User; doctor?: User; }
 interface Stats {
   users: Record<string, number>;
   appointments: { total: number; pending: number; confirmed: number; cancelled: number };
@@ -24,16 +23,14 @@ export default function AdminDashboard() {
   const { user: me } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
   const [users, setUsers] = useState<User[]>([]);
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [u, a, s] = await Promise.all([getAllUsers(), getAllAppointments(), getAdminStats()]);
+      const [u, s] = await Promise.all([getAllUsers(), getAdminStats()]);
       setUsers(u.data);
-      setAppointments(a.data);
       setStats(s.data);
     } finally {
       setLoading(false);
@@ -78,7 +75,7 @@ export default function AdminDashboard() {
           <>
             {activeTab === "Overview" && <OverviewTab stats={stats} />}
             {activeTab === "Users" && <UsersTab users={users} me={me} onDelete={handleDelete} />}
-            {activeTab === "Appointments" && <AppointmentsTab appointments={appointments} />}
+            {activeTab === "Appointments" && <AppointmentsTab />}
             {activeTab === "Audit Logs" && <AuditLogsTab />}
           </>
         )}

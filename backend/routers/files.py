@@ -41,6 +41,7 @@ def download_file(
             has_appointment = db.query(models.Appointment).filter(
                 models.Appointment.doctor_id == current_user.id,
                 models.Appointment.patient_id == f.patient_id,
+                models.Appointment.status != models.AppointmentStatus.cancelled,
             ).first()
             if not has_appointment:
                 raise HTTPException(status_code=403, detail="No appointment with this patient")

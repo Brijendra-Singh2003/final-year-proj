@@ -77,8 +77,8 @@ export const uploadLabTestResult = (assignmentId: number, file: File) => {
 // ADMIN
 export const getAllUsers = () => api.get("/admin/users");
 export const deleteUser = (id: number) => api.delete(`/admin/users/${id}`);
-export const getAllAppointments = () => api.get("/admin/appointments");
-export const getAllRecords = () => api.get("/admin/records");
+export const getAllAppointments = (skip = 0, limit = 50) => api.get("/admin/appointments", { params: { skip, limit } });
+export const getAllRecords = (skip = 0, limit = 50) => api.get("/admin/records", { params: { skip, limit } });
 export const getAdminStats = () => api.get("/admin/stats");
 export const getAuditLogs = (params?: { skip?: number; limit?: number; action?: string }) =>
     api.get("/admin/audit-logs", { params });
