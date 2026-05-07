@@ -6,8 +6,8 @@ import 'models/doctor_model.dart';
 class AppointmentApi {
   final ApiClient _client = ApiClient();
 
-  Future<List<DoctorModel>> getDoctors() async {
-    final response = await _client.dio.get(ApiEndpoints.getDoctors);
+  Future<List<DoctorModel>> searchDoctors() async {
+    final response = await _client.dio.get(ApiEndpoints.searchDoctors);
 
     return (response.data as List)
         .map((e) => DoctorModel.fromJson(e))

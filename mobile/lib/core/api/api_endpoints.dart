@@ -10,12 +10,12 @@ class ApiEndpoints {
   static const String getProfile = "/users/me";
 
   // ================= DOCTORS =================
-  static const String getDoctors = "/doctors";
+  static const String searchDoctors = "/patients/doctors/search";
 
   static String getDoctorById(int id) => "/doctors/$id";
 
-  static String getDoctorsBySpecialization(String specialization) =>
-      "/doctors?specialization=$specialization";
+  static String searchDoctorsBySpecialty(String specialty) =>
+      "/doctors?specialty=$specialty";
 
   // ================= APPOINTMENTS =================
   static const String getAppointments = "/appointments";

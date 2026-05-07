@@ -25,14 +25,14 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
     final state = ref.watch(appointmentProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.doctor.name)),
+      appBar: AppBar(title: Text(widget.doctor.name??"")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             // 👨‍⚕️ Doctor Info
             Text(
-              widget.doctor.specialization,
+              widget.doctor.specialty??"",
               style: const TextStyle(fontSize: 16),
             ),
 
@@ -69,7 +69,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                       final confirmed = await showDialog(
                         context: context,
                         builder: (_) => BookingConfirmationDialog(
-                          doctorName: widget.doctor.name,
+                          doctorName: widget.doctor.name??"",
                           date: selectedDate!,
                           time: selectedTime!,
                         ),
@@ -79,7 +79,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                         await ref
                             .read(appointmentProvider.notifier)
                             .bookAppointment(
-                              doctorId: widget.doctor.id,
+                              doctorId: widget.doctor.id??0,
                               date: selectedDate.toString(),
                               time: selectedTime!,
                             );

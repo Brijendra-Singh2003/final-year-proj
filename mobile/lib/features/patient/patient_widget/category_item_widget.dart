@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 class CategoryItemWidget extends StatelessWidget {
   final String label;
   final IconData icon;
-
+  final VoidCallback? onTap;
   const CategoryItemWidget({
     super.key,
     required this.label,
     required this.icon,
+    required this.onTap,
+    
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        // TODO: Navigate to doctor list
-      },
+      onTap: onTap,
       child: Column(
         children: [
           Container(

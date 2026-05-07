@@ -1,22 +1,25 @@
 class DoctorModel {
   final int id;
   final String name;
-  final String specialization;
-  final int experience;
+  final String email;
+  final String specialty;
+  final String? phone;
 
   DoctorModel({
     required this.id,
     required this.name,
-    required this.specialization,
-    required this.experience,
+    required this.email,
+    required this.specialty,
+    this.phone,
   });
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
     return DoctorModel(
       id: json["id"],
       name: json["name"],
-      specialization: json["specialization"],
-      experience: json["experience"],
+      specialty: json["specialty"],
+      email: json["email"],
+      phone: json["phone"],
     );
   }
 }

@@ -2,19 +2,40 @@ import 'package:mobile/features/authentication/data/models/auth_response.dart';
 import 'package:mobile/features/authentication/data/models/user_model.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_endpoints.dart';
+import 'package:mobile/features/authentication/data/models/auth_response.dart';
 /* import 'models/auth_response_model.dart'; */
 
 class AuthApi {
   final ApiClient _client = ApiClient();
 
-  Future<AuthResponse> login(String email, String password) async {
+  Future<AuthResponse> login(
+  String email,
+  String password,
+) async {
+
+  try {
+
+    print("LOGIN REQUEST STARTED");
+
     final response = await _client.dio.post(
       "/auth/login",
-      data: {"email": email, "password": password},
+      data: {
+        "email": email,
+        "password": password,
+      },
     );
+
     print("FULL LOGIN RESPONSE: ${response.data}");
+
     return AuthResponse.fromJson(response.data);
+
+  } catch (e) {
+
+    print("LOGIN API ERROR: $e");
+
+    rethrow;
   }
+}
 
   Future<UserModel> signup({
   required String name,

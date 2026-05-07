@@ -11,7 +11,7 @@ class AppointmentController extends StateNotifier<AppointmentState> {
     state = state.copyWith(isLoading: true);
 
     try {
-      final doctors = await _api.getDoctors();
+      final doctors = await _api.searchDoctors();
       state = state.copyWith(isLoading: false, doctors: doctors);
     } catch (e) {
   String message = "Something went wrong";
