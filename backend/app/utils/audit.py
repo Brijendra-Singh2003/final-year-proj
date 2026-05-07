@@ -5,7 +5,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-import models
+from app import models
 
 
 def _compute_hash(
@@ -17,15 +17,18 @@ def _compute_hash(
     details: Optional[str],
     prev_hash: Optional[str],
 ) -> str:
-    payload = json.dumps({
-        "timestamp": timestamp,
-        "user_id": user_id,
-        "action": action,
-        "resource_type": resource_type,
-        "resource_id": resource_id,
-        "details": details,
-        "prev_hash": prev_hash or "",
-    }, sort_keys=True)
+    payload = json.dumps(
+        {
+            "timestamp": timestamp,
+            "user_id": user_id,
+            "action": action,
+            "resource_type": resource_type,
+            "resource_id": resource_id,
+            "details": details,
+            "prev_hash": prev_hash or "",
+        },
+        sort_keys=True,
+    )
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
@@ -39,16 +42,17 @@ def log(
     ip_address: Optional[str] = None,
     user_agent: Optional[str] = None,
 ) -> models.AuditLog:
-    last = (
-        db.query(models.AuditLog)
-        .order_by(models.AuditLog.id.desc())
-        .first()
-    )
+    last = db.query(models.AuditLog).order_by(models.AuditLog.id.desc()).first()
     prev_hash = last.row_hash if last else None
     timestamp = datetime.utcnow()
     row_hash = _compute_hash(
-        timestamp.isoformat(), user_id, action,
-        resource_type, resource_id, details, prev_hash,
+        timestamp.isoformat(),
+        user_id,
+        action,
+        resource_type,
+        resource_id,
+        details,
+        prev_hash,
     )
     entry = models.AuditLog(
         user_id=user_id,
@@ -73,8 +77,13 @@ def verify_chain(db: Session) -> tuple[bool, Optional[int]]:
     prev_hash = None
     for entry in logs:
         expected = _compute_hash(
-            entry.timestamp.isoformat(), entry.user_id, entry.action,
-            entry.resource_type, entry.resource_id, entry.details, prev_hash,
+            entry.timestamp.isoformat(),
+            entry.user_id,
+            entry.action,
+            entry.resource_type,
+            entry.resource_id,
+            entry.details,
+            prev_hash,
         )
         if entry.row_hash != expected or entry.prev_hash != prev_hash:
             return False, entry.id

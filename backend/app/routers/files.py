@@ -4,15 +4,12 @@ import tempfile
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse
-from starlette.background import BackgroundTask
 from sqlalchemy.orm import Session
+from starlette.background import BackgroundTask
 
-import auth
-import audit
-import crypto
-import models
-from database import get_db
-
+from app import models
+from app.config.database import get_db
+from app.utils import audit, auth, crypto
 
 router = APIRouter(prefix="/files", tags=["files"])
 
@@ -25,7 +22,11 @@ def download_file(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_user),
 ):
-    f = db.query(models.TestResultFile).filter(models.TestResultFile.id == file_id).first()
+    f = (
+        db.query(models.TestResultFile)
+        .filter(models.TestResultFile.id == file_id)
+        .first()
+    )
     if not f:
         raise HTTPException(status_code=404, detail="File not found")
 
@@ -38,13 +39,19 @@ def download_file(
             if f.patient_id != current_user.id:
                 raise HTTPException(status_code=403, detail="Access denied")
         case models.RoleEnum.doctor:
-            has_appointment = db.query(models.Appointment).filter(
-                models.Appointment.doctor_id == current_user.id,
-                models.Appointment.patient_id == f.patient_id,
-                models.Appointment.status != models.AppointmentStatus.cancelled,
-            ).first()
+            has_appointment = (
+                db.query(models.Appointment)
+                .filter(
+                    models.Appointment.doctor_id == current_user.id,
+                    models.Appointment.patient_id == f.patient_id,
+                    models.Appointment.status != models.AppointmentStatus.cancelled,
+                )
+                .first()
+            )
             if not has_appointment:
-                raise HTTPException(status_code=403, detail="No appointment with this patient")
+                raise HTTPException(
+                    status_code=403, detail="No appointment with this patient"
+                )
         case models.RoleEnum.admin:
             pass
         case _:
@@ -62,9 +69,15 @@ def download_file(
         if f.hash_algo.lower() == "sha256" and h.hexdigest() != f.hash_hex:
             raise HTTPException(status_code=409, detail="File integrity check failed")
 
-    audit.log(db, "file.downloaded", user_id=current_user.id, resource_type="test_result_file",
-              resource_id=file_id, details=f"patient_id={f.patient_id}",
-              ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "file.downloaded",
+        user_id=current_user.id,
+        resource_type="test_result_file",
+        resource_id=file_id,
+        details=f"patient_id={f.patient_id}",
+        ip_address=request.client.host if request.client else None,
+    )
 
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".dec")
     tmp.close()
@@ -79,4 +92,3 @@ def download_file(
     except Exception:
         os.unlink(tmp.name)
         raise HTTPException(status_code=500, detail="Failed to decrypt file")
-

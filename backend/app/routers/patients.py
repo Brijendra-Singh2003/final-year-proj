@@ -1,8 +1,11 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from database import get_db
-import models, schemas, auth, audit
+
+from app import models, schemas
+from app.config.database import get_db
+from app.utils import audit, auth
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 
@@ -31,20 +34,28 @@ def book_appointment(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_patient),
 ):
-    doctor = db.query(models.User).filter(
-        models.User.id == payload.doctor_id,
-        models.User.role == models.RoleEnum.doctor
-    ).first()
+    doctor = (
+        db.query(models.User)
+        .filter(
+            models.User.id == payload.doctor_id,
+            models.User.role == models.RoleEnum.doctor,
+        )
+        .first()
+    )
     if not doctor:
         raise HTTPException(status_code=404, detail="Doctor not found")
 
     # Check slot conflict
-    conflict = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == payload.doctor_id,
-        models.Appointment.date == payload.date,
-        models.Appointment.time_slot == payload.time_slot,
-        models.Appointment.status != models.AppointmentStatus.cancelled,
-    ).first()
+    conflict = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.doctor_id == payload.doctor_id,
+            models.Appointment.date == payload.date,
+            models.Appointment.time_slot == payload.time_slot,
+            models.Appointment.status != models.AppointmentStatus.cancelled,
+        )
+        .first()
+    )
     if conflict:
         raise HTTPException(status_code=409, detail="This time slot is already booked")
 
@@ -58,9 +69,15 @@ def book_appointment(
     db.add(appt)
     db.commit()
     db.refresh(appt)
-    audit.log(db, "appointment.booked", user_id=current_user.id, resource_type="appointment",
-              resource_id=appt.id, details=f"doctor_id={payload.doctor_id} date={payload.date} slot={payload.time_slot}",
-              ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "appointment.booked",
+        user_id=current_user.id,
+        resource_type="appointment",
+        resource_id=appt.id,
+        details=f"doctor_id={payload.doctor_id} date={payload.date} slot={payload.time_slot}",
+        ip_address=request.client.host if request.client else None,
+    )
     return appt
 
 
@@ -84,10 +101,14 @@ def cancel_appointment(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_patient),
 ):
-    appt = db.query(models.Appointment).filter(
-        models.Appointment.id == appt_id,
-        models.Appointment.patient_id == current_user.id,
-    ).first()
+    appt = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.id == appt_id,
+            models.Appointment.patient_id == current_user.id,
+        )
+        .first()
+    )
     if not appt:
         raise HTTPException(status_code=404, detail="Appointment not found")
     if appt.status == models.AppointmentStatus.cancelled:
@@ -95,8 +116,14 @@ def cancel_appointment(
     appt.status = models.AppointmentStatus.cancelled
     db.commit()
     db.refresh(appt)
-    audit.log(db, "appointment.cancelled", user_id=current_user.id, resource_type="appointment",
-              resource_id=appt_id, ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "appointment.cancelled",
+        user_id=current_user.id,
+        resource_type="appointment",
+        resource_id=appt_id,
+        ip_address=request.client.host if request.client else None,
+    )
     return appt
 
 
@@ -106,8 +133,14 @@ def my_records(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_patient),
 ):
-    audit.log(db, "records.viewed", user_id=current_user.id, resource_type="patient",
-              resource_id=current_user.id, ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "records.viewed",
+        user_id=current_user.id,
+        resource_type="patient",
+        resource_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+    )
     return (
         db.query(models.MedicalRecord)
         .filter(models.MedicalRecord.patient_id == current_user.id)
@@ -115,16 +148,22 @@ def my_records(
     )
 
 
-@router.get("/records/{record_id}/test-files", response_model=List[schemas.TestResultFileOut])
+@router.get(
+    "/records/{record_id}/test-files", response_model=List[schemas.TestResultFileOut]
+)
 def my_record_test_files(
     record_id: int,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_patient),
 ):
-    record = db.query(models.MedicalRecord).filter(
-        models.MedicalRecord.id == record_id,
-        models.MedicalRecord.patient_id == current_user.id,
-    ).first()
+    record = (
+        db.query(models.MedicalRecord)
+        .filter(
+            models.MedicalRecord.id == record_id,
+            models.MedicalRecord.patient_id == current_user.id,
+        )
+        .first()
+    )
     if not record:
         raise HTTPException(status_code=404, detail="Medical record not found")
 

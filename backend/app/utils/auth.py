@@ -1,15 +1,15 @@
 import os
-import models
-
 from datetime import datetime, timedelta
+from typing import Optional
 
+from dotenv import load_dotenv
+from fastapi import Cookie, Depends, Header, HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status, Cookie, Header
-from typing import Optional
 from sqlalchemy.orm import Session
-from dotenv import load_dotenv
-from database import get_db
+
+from app import models
+from app.config.database import get_db
 
 load_dotenv()
 
@@ -30,7 +30,9 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.utcnow() + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -79,4 +81,5 @@ def require_role(*roles: str):
                 detail=f"Access denied. Required roles: {roles}",
             )
         return current_user
+
     return role_checker

@@ -1,19 +1,15 @@
+import hashlib
 import os
 import uuid
-import hashlib
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-import audit
-import auth
-import crypto
-import models
-import schemas
-from database import get_db
-
+from app import models, schemas
+from app.config.database import get_db
+from app.utils import audit, auth, crypto
 
 router = APIRouter(prefix="/lab", tags=["lab"])
 
@@ -21,7 +17,9 @@ require_lab = auth.require_role("lab")
 
 
 def _upload_base_dir() -> str:
-    return os.getenv("UPLOAD_DIR", os.path.join(os.path.dirname(__file__), "..", "storage"))
+    return os.getenv(
+        "UPLOAD_DIR", os.path.join(os.path.dirname(__file__), "..", "storage")
+    )
 
 
 @router.get("/assignments", response_model=list[schemas.LabUploadAssignmentOut])
@@ -49,9 +47,11 @@ def upload_test_result(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_lab),
 ):
-    assignment = db.query(models.LabUploadAssignment).filter(
-        models.LabUploadAssignment.id == assignment_id
-    ).first()
+    assignment = (
+        db.query(models.LabUploadAssignment)
+        .filter(models.LabUploadAssignment.id == assignment_id)
+        .first()
+    )
     if not assignment:
         raise HTTPException(status_code=404, detail="Assignment not found")
 
@@ -59,7 +59,9 @@ def upload_test_result(
         raise HTTPException(status_code=403, detail="Not allowed for this assignment")
 
     if assignment.status != models.LabUploadAssignmentStatus.assigned:
-        raise HTTPException(status_code=409, detail="Assignment is not available for upload")
+        raise HTTPException(
+            status_code=409, detail="Assignment is not available for upload"
+        )
 
     now = datetime.utcnow()
     if assignment.expires_at and assignment.expires_at <= now:
@@ -127,11 +129,18 @@ def upload_test_result(
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=409, detail="This assignment already has an uploaded file")
+        raise HTTPException(
+            status_code=409, detail="This assignment already has an uploaded file"
+        )
 
     db.refresh(test_file)
-    audit.log(db, "file.uploaded", user_id=current_user.id, resource_type="test_result_file",
-              resource_id=test_file.id, details=f"assignment_id={assignment_id} patient_id={assignment.patient_id}",
-              ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "file.uploaded",
+        user_id=current_user.id,
+        resource_type="test_result_file",
+        resource_id=test_file.id,
+        details=f"assignment_id={assignment_id} patient_id={assignment.patient_id}",
+        ip_address=request.client.host if request.client else None,
+    )
     return test_file
-

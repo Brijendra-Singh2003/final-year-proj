@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from typing import List
-from database import get_db
-import models, schemas, auth, audit
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+
+from app import models, schemas
+from app.config.database import get_db
+from app.utils import audit, auth
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -28,11 +31,17 @@ def delete_user(
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    if user.id == current_user.id: # type: ignore
+    if user.id == current_user.id:  # type: ignore
         raise HTTPException(status_code=400, detail="Cannot delete yourself")
-    audit.log(db, "admin.user_deleted", user_id=current_user.id, resource_type="user",
-              resource_id=user_id, details=f"deleted_email={user.email} role={user.role}",
-              ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "admin.user_deleted",
+        user_id=current_user.id,
+        resource_type="user",
+        resource_id=user_id,
+        details=f"deleted_email={user.email} role={user.role}",
+        ip_address=request.client.host if request.client else None,
+    )
     db.delete(user)
     db.commit()
 

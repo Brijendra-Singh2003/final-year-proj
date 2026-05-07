@@ -14,7 +14,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python seed.py          # optional – adds demo accounts
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 - API runs at **http://localhost:8000**
@@ -51,22 +51,26 @@ npm run dev
 final-year-proj/
 ├── docker-compose.yaml
 ├── backend/                    # FastAPI backend
-│   ├── main.py
-│   ├── database.py
-│   ├── models.py
-│   ├── schemas.py
-│   ├── auth.py
-│   ├── crypto.py
 │   ├── seed.py
-│   ├── storage/                # uploaded files / seeded assets
-│   └── routers/
-│       ├── __init__.py
-│       ├── auth.py
-│       ├── patients.py
-│       ├── doctors.py
-│       ├── admin.py
-│       ├── lab.py
-│       └── files.py
+│   ├── requirements.txt
+│   └── app/
+│       ├── main.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── config/
+│       │   └── database.py
+│       ├── utils/
+│       │   ├── auth.py
+│       │   ├── crypto.py
+│       │   └── audit.py
+│       └── routers/
+│           ├── __init__.py
+│           ├── auth.py
+│           ├── patients.py
+│           ├── doctors.py
+│           ├── admin.py
+│           ├── lab.py
+│           └── files.py
 ├── frontend/                   # Next.js 14 frontend
 │   ├── app/
 │   │   ├── login/

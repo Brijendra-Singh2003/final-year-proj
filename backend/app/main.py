@@ -1,15 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
-from database import engine
-import models
-from routers import auth, patients, doctors, admin, lab, files
+from slowapi.util import get_remote_address
+
+from app.config.database import engine
+from app.models import Base
+from app.routers import admin, auth, doctors, files, lab, patients
 
 # Create all database tables
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="MedConnect API",

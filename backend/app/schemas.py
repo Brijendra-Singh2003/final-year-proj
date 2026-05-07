@@ -1,8 +1,10 @@
 import re
-from pydantic import BaseModel, EmailStr, field_validator
-from typing import Optional, List
 from datetime import datetime
-from models import RoleEnum, AppointmentStatus, LabUploadAssignmentStatus
+from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr, field_validator
+
+from app.models import AppointmentStatus, LabUploadAssignmentStatus, RoleEnum
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _TIME_RE = re.compile(r"^(0[1-9]|1[0-2]):[0-5]\d (AM|PM)$")
@@ -12,6 +14,7 @@ _RESTRICTED_ROLES = {RoleEnum.admin, RoleEnum.lab}
 
 
 # ─── Auth ────────────────────────────────────────────────────────────────────
+
 
 class UserRegister(BaseModel):
     name: str
@@ -56,10 +59,11 @@ class UserOut(BaseModel):
 
 # ─── Appointments ────────────────────────────────────────────────────────────
 
+
 class AppointmentCreate(BaseModel):
     doctor_id: int
-    date: str          # "YYYY-MM-DD"
-    time_slot: str     # "09:00 AM"
+    date: str  # "YYYY-MM-DD"
+    time_slot: str  # "09:00 AM"
     notes: Optional[str] = None
 
     @field_validator("date")
@@ -99,6 +103,7 @@ class AppointmentOut(BaseModel):
 
 # ─── Lab Upload Assignments & Test Result Files ───────────────────────────────
 
+
 class LabUploadAssignmentCreate(BaseModel):
     lab_user_id: int
     expires_at: Optional[datetime] = None
@@ -137,6 +142,7 @@ class TestResultFileOut(BaseModel):
 
 
 # ─── Medical Records ─────────────────────────────────────────────────────────
+
 
 class ReportCreate(BaseModel):
     content: str

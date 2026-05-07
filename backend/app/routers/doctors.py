@@ -1,9 +1,12 @@
+from datetime import datetime
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from typing import List
-from database import get_db
-import models, schemas, auth, audit
-from datetime import datetime
+
+from app import models, schemas
+from app.config.database import get_db
+from app.utils import audit, auth
 
 router = APIRouter(prefix="/doctors", tags=["doctors"])
 
@@ -30,32 +33,50 @@ def confirm_appointment(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
-    appt = db.query(models.Appointment).filter(
-        models.Appointment.id == appt_id,
-        models.Appointment.doctor_id == current_user.id,
-    ).first()
+    appt = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.id == appt_id,
+            models.Appointment.doctor_id == current_user.id,
+        )
+        .first()
+    )
     if not appt:
         raise HTTPException(status_code=404, detail="Appointment not found")
     appt.status = models.AppointmentStatus.confirmed
     db.commit()
     db.refresh(appt)
-    audit.log(db, "appointment.confirmed", user_id=current_user.id, resource_type="appointment",
-              resource_id=appt_id, ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "appointment.confirmed",
+        user_id=current_user.id,
+        resource_type="appointment",
+        resource_id=appt_id,
+        ip_address=request.client.host if request.client else None,
+    )
     return appt
 
 
-@router.post("/patients/{patient_id}/records", response_model=schemas.MedicalRecordOut, status_code=201)
+@router.post(
+    "/patients/{patient_id}/records",
+    response_model=schemas.MedicalRecordOut,
+    status_code=201,
+)
 def create_patient_record(
     patient_id: int,
     payload: schemas.MedicalRecordCreate,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
-    has_appointment = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == current_user.id,
-        models.Appointment.patient_id == patient_id,
-        models.Appointment.status != models.AppointmentStatus.cancelled,
-    ).first()
+    has_appointment = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.doctor_id == current_user.id,
+            models.Appointment.patient_id == patient_id,
+            models.Appointment.status != models.AppointmentStatus.cancelled,
+        )
+        .first()
+    )
     if not has_appointment:
         raise HTTPException(status_code=403, detail="No appointment with this patient")
 
@@ -66,7 +87,9 @@ def create_patient_record(
     return record
 
 
-@router.get("/patients/{patient_id}/records", response_model=List[schemas.MedicalRecordOut])
+@router.get(
+    "/patients/{patient_id}/records", response_model=List[schemas.MedicalRecordOut]
+)
 def patient_records(
     patient_id: int,
     request: Request,
@@ -74,23 +97,37 @@ def patient_records(
     current_user: models.User = Depends(require_doctor),
 ):
     # Doctor can only view records of patients who have an appointment with them
-    has_appointment = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == current_user.id,
-        models.Appointment.patient_id == patient_id,
-        models.Appointment.status != models.AppointmentStatus.cancelled,
-    ).first()
+    has_appointment = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.doctor_id == current_user.id,
+            models.Appointment.patient_id == patient_id,
+            models.Appointment.status != models.AppointmentStatus.cancelled,
+        )
+        .first()
+    )
     if not has_appointment:
         raise HTTPException(status_code=403, detail="No appointment with this patient")
 
-    audit.log(db, "records.viewed", user_id=current_user.id, resource_type="patient",
-              resource_id=patient_id, ip_address=request.client.host if request.client else None)
-    records = db.query(models.MedicalRecord).filter(
-        models.MedicalRecord.patient_id == patient_id
-    ).all()
+    audit.log(
+        db,
+        "records.viewed",
+        user_id=current_user.id,
+        resource_type="patient",
+        resource_id=patient_id,
+        ip_address=request.client.host if request.client else None,
+    )
+    records = (
+        db.query(models.MedicalRecord)
+        .filter(models.MedicalRecord.patient_id == patient_id)
+        .all()
+    )
     return records
 
 
-@router.post("/records/{record_id}/reports", response_model=schemas.ReportOut, status_code=201)
+@router.post(
+    "/records/{record_id}/reports", response_model=schemas.ReportOut, status_code=201
+)
 def append_report(
     record_id: int,
     payload: schemas.ReportCreate,
@@ -98,16 +135,24 @@ def append_report(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
-    record = db.query(models.MedicalRecord).filter(models.MedicalRecord.id == record_id).first()
+    record = (
+        db.query(models.MedicalRecord)
+        .filter(models.MedicalRecord.id == record_id)
+        .first()
+    )
     if not record:
         raise HTTPException(status_code=404, detail="Medical record not found")
 
     # Verify the doctor has an appointment with this patient
-    has_appointment = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == current_user.id,
-        models.Appointment.patient_id == record.patient_id,
-        models.Appointment.status != models.AppointmentStatus.cancelled,
-    ).first()
+    has_appointment = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.doctor_id == current_user.id,
+            models.Appointment.patient_id == record.patient_id,
+            models.Appointment.status != models.AppointmentStatus.cancelled,
+        )
+        .first()
+    )
     if not has_appointment:
         raise HTTPException(status_code=403, detail="No appointment with this patient")
 
@@ -121,9 +166,15 @@ def append_report(
     db.add(report)
     db.commit()
     db.refresh(report)
-    audit.log(db, "report.created", user_id=current_user.id, resource_type="report",
-              resource_id=report.id, details=f"record_id={record_id} patient_id={record.patient_id}",
-              ip_address=request.client.host if request.client else None)
+    audit.log(
+        db,
+        "report.created",
+        user_id=current_user.id,
+        resource_type="report",
+        resource_id=report.id,
+        details=f"record_id={record_id} patient_id={record.patient_id}",
+        ip_address=request.client.host if request.client else None,
+    )
     return report
 
 
@@ -138,19 +189,29 @@ def create_lab_assignment(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
-    record = db.query(models.MedicalRecord).filter(models.MedicalRecord.id == record_id).first()
+    record = (
+        db.query(models.MedicalRecord)
+        .filter(models.MedicalRecord.id == record_id)
+        .first()
+    )
     if not record:
         raise HTTPException(status_code=404, detail="Medical record not found")
 
     # Verify the doctor has an appointment with this patient
-    has_appointment = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == current_user.id,
-        models.Appointment.patient_id == record.patient_id,
-    ).first()
+    has_appointment = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.doctor_id == current_user.id,
+            models.Appointment.patient_id == record.patient_id,
+        )
+        .first()
+    )
     if not has_appointment:
         raise HTTPException(status_code=403, detail="No appointment with this patient")
 
-    lab_user = db.query(models.User).filter(models.User.id == payload.lab_user_id).first()
+    lab_user = (
+        db.query(models.User).filter(models.User.id == payload.lab_user_id).first()
+    )
     if not lab_user or lab_user.role != models.RoleEnum.lab:
         raise HTTPException(status_code=404, detail="Lab uploader not found")
 
@@ -180,15 +241,23 @@ def list_lab_assignments(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
-    record = db.query(models.MedicalRecord).filter(models.MedicalRecord.id == record_id).first()
+    record = (
+        db.query(models.MedicalRecord)
+        .filter(models.MedicalRecord.id == record_id)
+        .first()
+    )
     if not record:
         raise HTTPException(status_code=404, detail="Medical record not found")
 
     # Verify the doctor has an appointment with this patient
-    has_appointment = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == current_user.id,
-        models.Appointment.patient_id == record.patient_id,
-    ).first()
+    has_appointment = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.doctor_id == current_user.id,
+            models.Appointment.patient_id == record.patient_id,
+        )
+        .first()
+    )
     if not has_appointment:
         raise HTTPException(status_code=403, detail="No appointment with this patient")
 
@@ -209,14 +278,22 @@ def list_test_files(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_doctor),
 ):
-    record = db.query(models.MedicalRecord).filter(models.MedicalRecord.id == record_id).first()
+    record = (
+        db.query(models.MedicalRecord)
+        .filter(models.MedicalRecord.id == record_id)
+        .first()
+    )
     if not record:
         raise HTTPException(status_code=404, detail="Medical record not found")
 
-    has_appointment = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == current_user.id,
-        models.Appointment.patient_id == record.patient_id,
-    ).first()
+    has_appointment = (
+        db.query(models.Appointment)
+        .filter(
+            models.Appointment.doctor_id == current_user.id,
+            models.Appointment.patient_id == record.patient_id,
+        )
+        .first()
+    )
     if not has_appointment:
         raise HTTPException(status_code=403, detail="No appointment with this patient")
 
@@ -243,8 +320,10 @@ def my_patients(
     current_user: models.User = Depends(require_doctor),
 ):
     """List all patients who have ever booked an appointment with this doctor."""
-    appts = db.query(models.Appointment).filter(
-        models.Appointment.doctor_id == current_user.id
-    ).all()
+    appts = (
+        db.query(models.Appointment)
+        .filter(models.Appointment.doctor_id == current_user.id)
+        .all()
+    )
     patient_ids = list({a.patient_id for a in appts})
     return db.query(models.User).filter(models.User.id.in_(patient_ids)).all()

@@ -1,14 +1,17 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Enum
+import enum
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
-from datetime import datetime
-import enum
-import crypto
-from database import Base
+
+from app.config.database import Base
+from app.utils import crypto
 
 
 class EncryptedText(TypeDecorator):
     """Transparently encrypts/decrypts text columns using AES-256-GCM."""
+
     impl = Text
     cache_ok = True
 
@@ -47,7 +50,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     role = Column(Enum(RoleEnum), nullable=False, default=RoleEnum.patient)
-    specialty = Column(String, nullable=True)   # for doctors
+    specialty = Column(String, nullable=True)  # for doctors
     phone = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -83,15 +86,21 @@ class Appointment(Base):
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     doctor_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    date = Column(String, nullable=False)        # "YYYY-MM-DD"
-    time_slot = Column(String, nullable=False)   # "09:00 AM"
+    date = Column(String, nullable=False)  # "YYYY-MM-DD"
+    time_slot = Column(String, nullable=False)  # "09:00 AM"
     status = Column(Enum(AppointmentStatus), default=AppointmentStatus.pending)
     notes = Column(EncryptedText, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    patient = relationship("User", foreign_keys=[patient_id], back_populates="appointments_as_patient")
-    doctor = relationship("User", foreign_keys=[doctor_id], back_populates="appointments_as_doctor")
-    medical_record = relationship("MedicalRecord", back_populates="appointment", uselist=False)
+    patient = relationship(
+        "User", foreign_keys=[patient_id], back_populates="appointments_as_patient"
+    )
+    doctor = relationship(
+        "User", foreign_keys=[doctor_id], back_populates="appointments_as_doctor"
+    )
+    medical_record = relationship(
+        "MedicalRecord", back_populates="appointment", uselist=False
+    )
 
 
 class MedicalRecord(Base):
@@ -99,14 +108,18 @@ class MedicalRecord(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    appointment_id = Column(Integer, ForeignKey("appointments.id"), nullable=True, unique=True)
+    appointment_id = Column(
+        Integer, ForeignKey("appointments.id"), nullable=True, unique=True
+    )
     summary = Column(EncryptedText, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     patient = relationship("User", back_populates="records")
     appointment = relationship("Appointment", back_populates="medical_record")
-    reports = relationship("Report", back_populates="record", cascade="all, delete-orphan")
+    reports = relationship(
+        "Report", back_populates="record", cascade="all, delete-orphan"
+    )
     lab_upload_assignments = relationship(
         "LabUploadAssignment", back_populates="record", cascade="all, delete-orphan"
     )
@@ -134,11 +147,17 @@ class LabUploadAssignment(Base):
     __tablename__ = "lab_upload_assignments"
 
     id = Column(Integer, primary_key=True, index=True)
-    record_id = Column(Integer, ForeignKey("medical_records.id"), nullable=False, index=True)
+    record_id = Column(
+        Integer, ForeignKey("medical_records.id"), nullable=False, index=True
+    )
     patient_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     doctor_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     lab_user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    status = Column(Enum(LabUploadAssignmentStatus), nullable=False, default=LabUploadAssignmentStatus.assigned)
+    status = Column(
+        Enum(LabUploadAssignmentStatus),
+        nullable=False,
+        default=LabUploadAssignmentStatus.assigned,
+    )
     created_at = Column(DateTime, default=datetime.utcnow)
     expires_at = Column(DateTime, nullable=True)
     consumed_at = Column(DateTime, nullable=True)
@@ -167,7 +186,9 @@ class TestResultFile(Base):
     assignment_id = Column(
         Integer, ForeignKey("lab_upload_assignments.id"), nullable=False, unique=True
     )
-    record_id = Column(Integer, ForeignKey("medical_records.id"), nullable=False, index=True)
+    record_id = Column(
+        Integer, ForeignKey("medical_records.id"), nullable=False, index=True
+    )
     patient_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     uploaded_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
@@ -183,7 +204,9 @@ class TestResultFile(Base):
     record = relationship("MedicalRecord", back_populates="test_result_files")
     patient = relationship("User", foreign_keys=[patient_id])
     uploaded_by = relationship(
-        "User", foreign_keys=[uploaded_by_user_id], back_populates="test_result_files_uploaded"
+        "User",
+        foreign_keys=[uploaded_by_user_id],
+        back_populates="test_result_files_uploaded",
     )
 
 
