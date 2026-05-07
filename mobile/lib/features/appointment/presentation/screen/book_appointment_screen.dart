@@ -4,7 +4,7 @@ import 'package:mobile/features/appointment/data/models/doctor_model.dart';
 import 'package:mobile/features/appointment/presentation/widget/booking_confirmation.dart';
 import 'package:mobile/features/appointment/presentation/widget/date_selector_widget.dart';
 import 'package:mobile/features/appointment/presentation/widget/time_slot_widget.dart';
-import 'package:mobile/riverpod/appointment/appointmenr_provider.dart';
+import 'package:mobile/riverpod/appointment/appointment_provider.dart';
 
 class BookAppointmentScreen extends ConsumerStatefulWidget {
   final DoctorModel doctor;
@@ -19,7 +19,8 @@ class BookAppointmentScreen extends ConsumerStatefulWidget {
 class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   DateTime? selectedDate;
   String? selectedTime;
-
+  final TextEditingController notesController =
+    TextEditingController();
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(appointmentProvider);
@@ -63,30 +64,120 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
 
             // ✅ Confirm Button
             ElevatedButton(
-              onPressed: (selectedDate == null || selectedTime == null)
+              /* onPressed: (selectedDate == null || selectedTime == null)
                   ? null
                   : () async {
-                      final confirmed = await showDialog(
-                        context: context,
-                        builder: (_) => BookingConfirmationDialog(
-                          doctorName: widget.doctor.name??"",
-                          date: selectedDate!,
-                          time: selectedTime!,
-                        ),
-                      );
 
-                      if (confirmed == true) {
-                        await ref
-                            .read(appointmentProvider.notifier)
-                            .bookAppointment(
-                              doctorId: widget.doctor.id??0,
-                              date: selectedDate.toString(),
-                              time: selectedTime!,
-                            );
+  await ref
+      .read(appointmentProvider.notifier)
+      .bookAppointment(
 
-                        Navigator.pop(context);
-                      }
-                    },
+        doctorId: doctor.id,
+
+        date: selectedDate
+            ?.toIso8601String()
+            .split("T")[0],
+
+        timeSlot: selectedTimeSlot,
+
+        notes: notesController.text,
+      );
+
+  final appointmentState =
+      ref.read(appointmentProvider);
+
+  // ✅ Success
+  if (appointmentState.isBooked) {
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Appointment booked successfully",
+        ),
+      ),
+    );
+
+    Navigator.pop(context);
+  }
+
+  // ❌ Error
+  else if (appointmentState.error != null) {
+
+    String message =
+        appointmentState.error!;
+
+    if (message.contains(
+        "already booked")) {
+
+      message =
+          "This time slot is already booked.";
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+}, */
+onPressed: (selectedDate == null || selectedTime == null)
+    ? null
+    : () async {
+
+        await ref
+            .read(appointmentProvider.notifier)
+            .bookAppointment(
+
+              doctorId: widget.doctor.id,
+
+              date: selectedDate!
+                  .toIso8601String()
+                  .split("T")[0],
+
+              timeSlot: selectedTime!,
+
+              notes: notesController.text,
+            );
+
+        final appointmentState =
+            ref.read(appointmentProvider);
+
+        // ✅ Success
+        if (appointmentState.isBooked) {
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Appointment booked successfully",
+              ),
+            ),
+          );
+
+          Navigator.pop(context);
+        }
+
+        // ❌ Error
+        else if (appointmentState.error != null) {
+
+          String message =
+              appointmentState.error!;
+
+          if (message.contains(
+              "already booked")) {
+
+            message =
+                "This time slot is already booked.";
+          }
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(
+            SnackBar(
+              content: Text(message),
+            ),
+          );
+        }
+      },
               child: state.isLoading
                   ? const CircularProgressIndicator()
                   : const Text("Confirm Booking"),
