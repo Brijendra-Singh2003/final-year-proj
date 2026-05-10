@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/core/theme/theme.dart';
 import 'package:mobile/features/authentication/presentation/widget/auth_text_field.dart';
+import 'package:mobile/features/authentication/presentation/widget/customAppBar.dart';
 import '../../../../riverpod/auth/auth_provider.dart';
-/* import '../widgets/auth_textfield.dart';
- */
+
 import 'login_screen.dart';
 
 class SignupScreen extends ConsumerWidget {
@@ -34,100 +35,149 @@ class SignupScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Signup")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            AuthTextField(hint: "Name", controller: nameController),
-            const SizedBox(height: 10),
-            AuthTextField(hint: "Email", controller: emailController),
-            const SizedBox(height: 10),
-            AuthTextField(
-              hint: "Password",
-              controller: passwordController,
-              isPassword: true,
-            ),
-            const SizedBox(height: 10),
-            AuthTextField(
-              hint: "Phone Number",
-              controller: phoneNumberController,
-            ),
-            const SizedBox(height: 20),
+      appBar: CustomAppBar(title: "Signup", color: Colors.white),
+      body: Container(
+        decoration: BoxDecoration(gradient: AppTheme.linearGradient()),
+        width: double.infinity,
+        height: double.infinity,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+                  AuthTextField(
+                    hintText: "Name",
+                    controller: nameController,
+                    type: TextInputType.name,
+                    icon: Icons.person,
+                    onChanged: (value) {},
+                  ),
+                  const SizedBox(height: 10),
+                  AuthTextField(
+                    hintText: "Email",
+                    controller: emailController,
+                    type: TextInputType.emailAddress,
+                    icon: Icons.email,
+                    onChanged: (value) {},
+                  ),
+                  const SizedBox(height: 10),
+                  AuthTextField(
+                    hintText: "Password",
+                    controller: passwordController,
+                    type: TextInputType.visiblePassword,
+                    icon: Icons.lock,
+                    onChanged: (value) {},
+                    isPassword: true,
+                  ),
+                  const SizedBox(height: 10),
+                  AuthTextField(
+                    hintText: "Phone Number",
+                    controller: phoneNumberController,
+                    type: TextInputType.phone,
+                    icon: Icons.phone,
+                    onChanged: (value) {},
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
 
-            ElevatedButton(
-  onPressed: authState.isLoading 
-      ? null 
-      : () async {
-          // 1. Extract values
-          final email = emailController.text.trim();
-          final password = passwordController.text.trim();
-          final name = nameController.text.trim();
-          final phone = phoneNumberController.text.trim();
+                    child: ElevatedButton(
+                      onPressed: authState.isLoading
+                          ? null
+                          : () async {
+                              final email = emailController.text.trim();
 
-          // 2. Perform the signup
-          await ref.read(authProvider.notifier).signup(name, email, password, phone);
+                              final password = passwordController.text.trim();
 
-          // 3. Check if the widget is still in the tree before using context
-          if (!context.mounted) return;
+                              final name = nameController.text.trim();
 
-          // 4. Check the updated state
-          final state = ref.read(authProvider);
+                              final phone = phoneNumberController.text.trim();
 
-          if (state.error == null) {
-            // ✅ Success → navigate
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => LoginScreen()),
-            );
-          } else {
-            // ❌ Show error
-            _showErrorDialog(context, state.error!);
-          }
-        },
-  child: authState.isLoading
-      ? const SizedBox(
-          height: 20,
-          width: 20,
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-        )
-      : const Text("Signup"),
-),
+                              await ref
+                                  .read(authProvider.notifier)
+                                  .signup(name, email, password, phone);
 
-            const SizedBox(height: 20),
+                              if (!context.mounted) return;
 
-            // 🔥 Already user? Login
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Already a user? "),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => LoginScreen()),
-                    );
-                  },
-                  child: const Text(
-                    "Login now",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
+                              final state = ref.read(authProvider);
+
+                              if (state.error == null) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => LoginScreen(),
+                                  ),
+                                );
+                              } else {
+                                _showErrorDialog(context, state.error!);
+                              }
+                            },
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.lightTheme().primaryColor,
+
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+
+                      child: authState.isLoading
+                          ? const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              "Signup",
+
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
-                ),
-              ],
-            ),
 
-            if (authState.error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  authState.error!,
-                  style: const TextStyle(color: Colors.red),
-                ),
+                  const SizedBox(height: 20),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already a user? "),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => LoginScreen()),
+                          );
+                        },
+                        child: const Text(
+                          "Login now",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  if (authState.error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        authState.error!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                ],
               ),
-          ],
+            ),
+          ),
         ),
       ),
     );
