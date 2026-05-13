@@ -4,10 +4,11 @@ class CustomAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final String title;
   final Color color;
-
+final PreferredSizeWidget? bottom;
   const CustomAppBar({
     required this.title,
     required this.color,
+    this.bottom,
     super.key,
   });
 
@@ -17,7 +18,7 @@ class CustomAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: color,
+      backgroundColor: Colors.white,
       centerTitle: true,
       title: Text(
         title,

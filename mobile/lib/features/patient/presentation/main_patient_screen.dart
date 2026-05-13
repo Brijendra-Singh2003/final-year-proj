@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/appointment/presentation/screen/appointment_screen.dart';
+import 'package:mobile/features/patient/records/records_screen.dart';
 import 'patient_dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> screens = const [
     PatientDashboardScreen(),
     AppointmentsScreen(),
-    Center(child: Text("Records")),
+    RecordsScreen(),
     Center(child: Text("Profile")),
   ];
 
