@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:mobile/core/theme/theme.dart';
+
 import 'package:mobile/features/appointment/presentation/screen/pastwidget.dart';
+
 import 'package:mobile/features/appointment/presentation/screen/upcomingWidget.dart';
+
 import 'package:mobile/features/authentication/presentation/widget/customAppBar.dart';
+
+import 'package:mobile/riverpod/appointment/appointment_provider.dart';
 
 class AppointmentsScreen extends ConsumerStatefulWidget {
   const AppointmentsScreen({super.key});
@@ -20,31 +26,30 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
   void initState() {
     super.initState();
 
+    // 🔥 Initialize TabController
     _tabController = TabController(length: 2, vsync: this);
 
-    // TODO:
-    // fetch appointments here later
+    // 🔥 Fetch appointments
+    Future.microtask(() {
+      ref.read(appointmentProvider.notifier).fetchAppointments();
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO:
-    // Replace with provider state later
-
-    final upcomingAppointments = [];
-    final pastAppointments = [];
-
     return Scaffold(
       appBar: CustomAppBar(title: "Appointments", color: Colors.white),
 
       body: Column(
         children: [
+          // 🔥 Tabs
           Material(
             color: Colors.white,
 
@@ -59,16 +64,20 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen>
 
               tabs: const [
                 Tab(text: "Upcoming"),
+
                 Tab(text: "Past"),
               ],
             ),
           ),
 
+          // 🔥 Tab Screens
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
+
+              children: const [
                 UpcomingAppointmentsWidget(),
+
                 PastAppointmentsWidget(),
               ],
             ),

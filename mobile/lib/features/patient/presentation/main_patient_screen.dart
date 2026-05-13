@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/appointment/presentation/screen/appointment_screen.dart';
+import 'package:mobile/features/patient/presentation/patient_profile_screen.dart';
 import 'package:mobile/features/patient/records/records_screen.dart';
 import 'patient_dashboard_screen.dart';
 
@@ -17,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
     PatientDashboardScreen(),
     AppointmentsScreen(),
     RecordsScreen(),
-    Center(child: Text("Profile")),
+    PatientProfileScreen()
   ];
 
   @override

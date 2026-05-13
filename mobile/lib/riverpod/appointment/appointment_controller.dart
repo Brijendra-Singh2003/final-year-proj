@@ -2,60 +2,51 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../../features/appointment/data/appointment_api.dart';
 import 'appointment_state.dart';
 import 'package:dio/dio.dart';
+
 class AppointmentController extends StateNotifier<AppointmentState> {
   final AppointmentApi _api;
 
   AppointmentController(this._api) : super(AppointmentState());
 
-  Future<void> fetchDoctors() async {
+  /*  Future<void> fetchDoctors() async {
     state = state.copyWith(isLoading: true);
 
     try {
       final doctors = await _api.searchDoctors();
       state = state.copyWith(isLoading: false, doctors: doctors);
     } catch (e) {
-  String message = "Something went wrong";
+      String message = "Something went wrong";
 
-  if (e is DioException) {
-    message = e.response?.data["detail"] ??
-              e.message ??
-              "Network error";
-  }
+      if (e is DioException) {
+        message = e.response?.data["detail"] ?? e.message ?? "Network error";
+      }
 
-  state = state.copyWith(
-    isLoading: false,
-    error: message,
-  );
-}
-  }
+      state = state.copyWith(isLoading: false, error: message);
+    }
+  } */
 
   Future<void> fetchAppointments() async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final appointments = await _api.getAppointments();
-      state =
-          state.copyWith(isLoading: false, appointments: appointments);
+      final appointments = await _api.fetchAppointments();
+
+      state = state.copyWith(isLoading: false, appointments: appointments);
     } catch (e) {
-  String message = "Something went wrong";
+      String message = "Something went wrong";
 
-  if (e is DioException) {
-    message = e.response?.data["detail"] ??
-              e.message ??
-              "Network error";
-  }
+      if (e is DioException) {
+        message = e.response?.data["detail"] ?? e.message ?? "Network error";
+      }
 
-  state = state.copyWith(
-    isLoading: false,
-    error: message,
-  );
-}
+      state = state.copyWith(isLoading: false, error: message);
+    }
   }
 
   Future<void> bookAppointment({
     required int doctorId,
     required String date,
-    required String time,
+    required String timeSlot,
   }) async {
     state = state.copyWith(isLoading: true);
 
@@ -63,23 +54,18 @@ class AppointmentController extends StateNotifier<AppointmentState> {
       await _api.bookAppointment(
         doctorId: doctorId,
         date: date,
-        time: time,
+        timeSlot: timeSlot,
       );
-
       await fetchAppointments(); // refresh list
     } catch (e) {
-  String message = "Something went wrong";
+      ///String message = "Something went wrong";
+      print("Actual error: $e");
+      String message = e.toString();
+      if (e is DioException) {
+        message = e.response?.data["detail"] ?? e.message ?? "Network error";
+      }
 
-  if (e is DioException) {
-    message = e.response?.data["detail"] ??
-              e.message ??
-              "Network error";
-  }
-
-  state = state.copyWith(
-    isLoading: false,
-    error: message,
-  );
-}
+      state = state.copyWith(isLoading: false, error: message);
+    }
   }
 }

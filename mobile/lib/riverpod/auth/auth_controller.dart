@@ -30,6 +30,12 @@ Future<void> fetchUserProfile() async {
     } catch (e) {
       String errorMessage = "An unexpected error occurred";
       if (e is DioException) {
+        final data = e.response?.data;
+        if (data is Map<String, dynamic>) {
+          errorMessage = data['detail'].toString();
+        }  else {
+          errorMessage = data.toString();
+        }
         if (e.response != null && e.response?.data != null) {
           errorMessage = e.response?.data['message'] ?? errorMessage;
         } else {
