@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -8,6 +11,10 @@ from slowapi.util import get_remote_address
 from app.config.database import engine
 from app.models import Base
 from app.routers import admin, auth, doctors, files, lab, patients
+
+load_dotenv()
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
@@ -27,7 +34,7 @@ app.add_middleware(SlowAPIMiddleware)
 # CORS - allow Next.js dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
