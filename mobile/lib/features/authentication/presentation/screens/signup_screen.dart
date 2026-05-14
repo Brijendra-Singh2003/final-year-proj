@@ -37,7 +37,7 @@ class SignupScreen extends ConsumerWidget {
     return Scaffold(
       appBar: CustomAppBar(title: "Signup", color: Colors.white),
       body: Container(
-        decoration: BoxDecoration(gradient: AppTheme.linearGradient()),
+        decoration: BoxDecoration(color: AppTheme.bgSecondary),
         width: double.infinity,
         height: double.infinity,
         child: SafeArea(

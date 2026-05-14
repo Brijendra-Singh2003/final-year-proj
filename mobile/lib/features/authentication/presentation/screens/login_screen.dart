@@ -65,7 +65,7 @@ class LoginScreen extends ConsumerWidget {
       appBar: CustomAppBar(title: "Login", color: Colors.white),
 
       body: Container(
-        decoration: BoxDecoration(gradient: AppTheme.linearGradient()),
+        decoration: BoxDecoration(color: AppTheme.bgSecondary),
         width: double.infinity,
         height: double.infinity,
         child: SafeArea(
