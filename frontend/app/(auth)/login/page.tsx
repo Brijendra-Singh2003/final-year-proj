@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Activity, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
@@ -13,8 +13,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { refresh } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const registered = searchParams.get("registered") === "1";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,9 +24,15 @@ export default function LoginPage() {
       const role = res.data.user.role;
       router.push(`/${role}/dashboard`);
     } catch (err: unknown) {
-      const e = err as { response?: { data?: { detail?: string | { msg: string }[] } } };
+      const e = err as {
+        response?: { data?: { detail?: string | { msg: string }[] } };
+      };
       const detail = e?.response?.data?.detail;
-      setError(Array.isArray(detail) ? detail.map((d) => d.msg).join(", ") : detail || "Login failed");
+      setError(
+        Array.isArray(detail)
+          ? detail.map((d) => d.msg).join(", ")
+          : detail || "Login failed",
+      );
     } finally {
       setLoading(false);
     }
@@ -37,26 +41,29 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-linear-to-br from-bg-secondary via-accent-subtle to-bg-primary">
       <div className="w-full max-w-md bg-bg-card rounded-2xl p-10 shadow-form border border-border">
-
         {/* Brand */}
         <div className="flex items-center gap-3 mb-8">
           <div className="bg-accent-subtle border border-accent-medium p-2 rounded-xl">
             <Activity size={24} className="text-accent" />
           </div>
           <div>
-            <h1 className="gradient-text font-extrabold text-lg font-display">MedConnect</h1>
+            <h1 className="gradient-text font-extrabold text-lg font-display">
+              MedConnect
+            </h1>
             <p className="text-xs text-text-muted">Digital Health Platform</p>
           </div>
         </div>
 
-        <h2 className="font-extrabold text-2xl text-text-primary mb-1 font-display">Welcome back 👋</h2>
-        <p className="text-text-secondary text-sm mb-7">Sign in to access your health dashboard</p>
+        <h2 className="font-extrabold text-2xl text-text-primary mb-1 font-display">
+          Welcome back 👋
+        </h2>
+        <p className="text-text-secondary text-sm mb-7">
+          Sign in to access your health dashboard
+        </p>
 
-        {registered && (
-          <div className="mb-5 px-4 py-3 rounded-xl text-sm bg-green-50 text-green-700 border border-green-200">
-            Account created! Please sign in.
-          </div>
-        )}
+        <Suspense>
+          <RegisteredToast />
+        </Suspense>
 
         {error && (
           <div className="mb-5 px-4 py-3 rounded-xl text-sm bg-red-50 text-danger border border-red-200">
@@ -68,7 +75,10 @@ export default function LoginPage() {
           <div>
             <label>Email Address</label>
             <div className="relative">
-              <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Mail
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
+              />
               <input
                 id="email"
                 type="email"
@@ -85,7 +95,10 @@ export default function LoginPage() {
           <div>
             <label>Password</label>
             <div className="relative">
-              <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Lock
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
+              />
               <input
                 id="password"
                 type={showPass ? "text" : "password"}
@@ -111,13 +124,23 @@ export default function LoginPage() {
             className="btn-primary justify-center py-3.5 text-base mt-1"
             disabled={loading}
           >
-            {loading ? "Signing in…" : <><span>Sign In</span><ArrowRight size={16} /></>}
+            {loading ? (
+              "Signing in…"
+            ) : (
+              <>
+                <span>Sign In</span>
+                <ArrowRight size={16} />
+              </>
+            )}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-text-secondary">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-accent font-bold no-underline hover:underline">
+          <Link
+            href="/register"
+            className="text-accent font-bold no-underline hover:underline"
+          >
             Create one free
           </Link>
         </p>
@@ -125,3 +148,16 @@ export default function LoginPage() {
     </div>
   );
 }
+
+const RegisteredToast = () => {
+  const searchParams = useSearchParams();
+  const registered = searchParams.get("registered") === "1";
+
+  return (
+    registered && (
+      <div className="mb-5 px-4 py-3 rounded-xl text-sm bg-green-50 text-green-700 border border-green-200">
+        Account created! Please sign in.
+      </div>
+    )
+  );
+};
