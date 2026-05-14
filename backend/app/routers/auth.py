@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
@@ -7,6 +10,10 @@ from app import models, schemas
 from app.config.database import get_db
 from app.utils import audit, auth
 
+
+load_dotenv()
+
+ENV = os.getenv("ENV", "dev")
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -74,7 +81,8 @@ def login(
         value=token,
         httponly=True,
         max_age=3600,
-        samesite="lax",
+        secure=ENV == "production",
+        samesite="none" if ENV == "production" else "lax",
     )
     audit.log(
         db,
