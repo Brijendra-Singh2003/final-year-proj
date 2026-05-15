@@ -201,7 +201,7 @@ class LoginScreen extends ConsumerWidget {
                           "Signup now",
 
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: AppTheme.darkGreen,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

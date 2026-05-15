@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
-
+import 'package:mobile/core/theme/theme.dart';
 class CategoryItemWidget extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback? onTap;
+  final Color backgroundColor;
+
+final Color iconColor;
+
+final Color textColor;
   const CategoryItemWidget({
     super.key,
     required this.label,
     required this.icon,
     required this.onTap,
+    required this.backgroundColor,
+    required this.iconColor ,
+    required this.textColor,
     
   });
 
@@ -23,16 +31,16 @@ class CategoryItemWidget extends StatelessWidget {
             height: 60,
             width: 60,
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: backgroundColor,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, color: Colors.blue),
+            child: Icon(icon, color: iconColor),
           ),
           const SizedBox(height: 6),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12),
+            style: TextStyle(fontSize: 12, color: textColor),
           ),
         ],
       ),
