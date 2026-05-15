@@ -1,33 +1,35 @@
 class RecordModel {
-
   final int id;
 
-  final String title;
+  final String summary;
 
   final String createdAt;
+  final List reports;
+  final List testResultFiles;
 
   RecordModel({
-
     required this.id,
 
-    required this.title,
+    required this.summary,
 
     required this.createdAt,
+    required this.reports,
+    required this.testResultFiles,
   });
 
-  factory RecordModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
-
+  factory RecordModel.fromJson(Map<String, dynamic> json) {
     return RecordModel(
-
       id: json["id"] ?? 0,
 
-      title:
-          json["title"] ?? "",
+      summary: json["summary"] ?? "",
 
-      createdAt:
-          json["created_at"] ?? "",
+      createdAt: json["created_at"] ?? "",
+      reports:
+          json["reports"] ?? [],
+
+      testResultFiles:
+          json["test_result_files"] ?? [],
+
     );
   }
 }
