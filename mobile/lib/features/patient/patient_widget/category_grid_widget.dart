@@ -314,7 +314,7 @@ class CategoryGridWidget
                     (context) =>
                         DoctorListScreen(
 
-                  specialty:
+                  searchQuery:
                       category["value"]
                           as String?,
                 ),

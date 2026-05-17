@@ -7,11 +7,11 @@ import 'package:mobile/riverpod/doctor_provider.dart';
 import '../../data/models/doctor_model.dart';
 
 class DoctorListScreen extends ConsumerStatefulWidget {
-  final String? specialty;
+  final String? searchQuery;
 
   const DoctorListScreen({
     super.key,
-    this.specialty,
+    this.searchQuery,
   });
 
   @override
@@ -47,7 +47,7 @@ class _DoctorListScreenState
     if (doctorState.error != null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(widget.specialty ?? "All Doctors"),
+          title: Text(widget.searchQuery ?? "All Doctors"),
         ),
         body: Center(
           child: Text(doctorState.error!),
@@ -56,27 +56,31 @@ class _DoctorListScreenState
     }
 
     // ✅ Filtering
-final filteredDoctors = widget.specialty == null
-    ? doctorState.doctors
-    : doctorState.doctors.where((doctor) {
+final query =
+    widget.searchQuery
+        ?.toLowerCase() ?? "";
 
-        final doctorSpecialty =
-            (doctor.specialty ?? "").trim().toLowerCase();
+final filteredDoctors =
+    doctorState.doctors.where((doctor) {
 
-        final selectedSpecialty =
-            (widget.specialty ?? "").trim().toLowerCase();
+  final doctorName =
+      doctor.name
+          .toLowerCase();
 
-        /* print("DOCTOR: $doctorSpecialty");
-        print("SELECTED: $selectedSpecialty"); */
+  final doctorSpecialty =
+      doctor.specialty
+          .toLowerCase();
 
-        return doctorSpecialty == selectedSpecialty;
+  return doctorName.contains(query) ||
 
-      }).toList();
+      doctorSpecialty.contains(query);
+
+}).toList();
 //final filteredDoctors = doctorState.doctors;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.specialty ?? "All Doctors",
+          widget.searchQuery ?? "All Doctors",
         ),
       ),
 
