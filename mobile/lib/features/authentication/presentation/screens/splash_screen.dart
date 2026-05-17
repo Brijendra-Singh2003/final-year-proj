@@ -30,7 +30,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       Future.microtask(() {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const MainScreen()),
+          MaterialPageRoute(builder: (_) => const MainScreen(initialIndex: 0)),
         );
       });
     } else {

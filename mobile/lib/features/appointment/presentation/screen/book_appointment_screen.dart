@@ -4,6 +4,7 @@ import 'package:mobile/features/appointment/data/models/doctor_model.dart';
 import 'package:mobile/features/appointment/presentation/widget/booking_confirmation.dart';
 import 'package:mobile/features/appointment/presentation/widget/date_selector_widget.dart';
 import 'package:mobile/features/appointment/presentation/widget/time_slot_widget.dart';
+import 'package:mobile/features/patient/presentation/main_patient_screen.dart';
 import 'package:mobile/riverpod/appointment/appointment_provider.dart';
 
 class BookAppointmentScreen extends ConsumerStatefulWidget {
@@ -154,7 +155,14 @@ onPressed: (selectedDate == null || selectedTime == null)
             ),
           );
 
-          Navigator.pop(context);
+          /* Navigator.pop(context); */
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const MainScreen(initialIndex: 1),
+              ),
+              (route) => false,
+            );
         }
 
         // ❌ Error

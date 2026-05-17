@@ -145,7 +145,7 @@ class LoginScreen extends ConsumerWidget {
                                   context,
 
                                   MaterialPageRoute(
-                                    builder: (_) => const MainScreen(),
+                                    builder: (_) => const MainScreen(initialIndex: 0),
                                   ),
                                 );
                               } else if (updatedState.error != null) {

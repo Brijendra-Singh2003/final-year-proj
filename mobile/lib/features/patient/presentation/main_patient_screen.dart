@@ -72,22 +72,17 @@ import 'package:mobile/features/patient/records/records_screen.dart';
 import 'patient_dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
-
-  const MainScreen({super.key});
+  final int initialIndex;
+  const MainScreen({super.key, required this.initialIndex});
 
   @override
-  State<MainScreen> createState() =>
-      _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState
-    extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> {
+  late int currentIndex;
 
-  int currentIndex = 0;
-
-  final List<Widget> screens =
-      const [
-
+  final List<Widget> screens = const [
     PatientDashboardScreen(),
 
     AppointmentsScreen(),
@@ -98,119 +93,71 @@ class _MainScreenState
   ];
 
   @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.initialIndex;
+  }
+
   Widget build(BuildContext context) {
-
     return Scaffold(
+      backgroundColor: AppTheme.bgPrimary,
 
-      backgroundColor:
-          AppTheme.bgPrimary,
+      body: screens[currentIndex],
 
-      body:
-          screens[currentIndex],
-
-      bottomNavigationBar:
-          Container(
-
-        decoration:
-            BoxDecoration(
-
-          color:
-              Colors.white,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
 
           boxShadow: [
-
             BoxShadow(
-
-              color: Colors.black
-                  .withOpacity(0.05),
+              color: Colors.black.withOpacity(0.05),
 
               blurRadius: 10,
 
-              offset:
-                  const Offset(0, -2),
+              offset: const Offset(0, -2),
             ),
           ],
         ),
 
         child: BottomNavigationBar(
-
-          currentIndex:
-              currentIndex,
+          currentIndex: currentIndex,
 
           onTap: (index) {
-
             setState(() {
-
-              currentIndex =
-                  index;
+              currentIndex = index;
             });
           },
 
-          type:
-              BottomNavigationBarType.fixed,
+          type: BottomNavigationBarType.fixed,
 
-          backgroundColor:
-              Colors.white,
+          backgroundColor: Colors.white,
 
           elevation: 0,
 
-          selectedItemColor:
-              AppTheme.primaryGreen,
+          selectedItemColor: AppTheme.primaryGreen,
 
-          unselectedItemColor:
-              AppTheme.textMuted,
+          unselectedItemColor: AppTheme.textMuted,
 
-          selectedLabelStyle:
-              const TextStyle(
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
 
-            fontWeight:
-                FontWeight.w600,
-          ),
-
-          unselectedLabelStyle:
-              const TextStyle(
-
-            fontWeight:
-                FontWeight.w500,
-          ),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
 
           items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
 
             BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
 
-              icon:
-                  Icon(Icons.home),
-
-              label: "Home",
+              label: "Appointments",
             ),
 
             BottomNavigationBarItem(
+              icon: Icon(Icons.description),
 
-              icon: Icon(
-                Icons.calendar_today,
-              ),
-
-              label:
-                  "Appointments",
+              label: "Records",
             ),
 
-            BottomNavigationBarItem(
-
-              icon: Icon(
-                Icons.description,
-              ),
-
-              label:
-                  "Records",
-            ),
-
-            BottomNavigationBarItem(
-
-              icon:
-                  Icon(Icons.person),
-
-              label: "Profile",
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
           ],
         ),
       ),
