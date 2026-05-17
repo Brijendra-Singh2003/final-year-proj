@@ -158,7 +158,7 @@ class SignupScreen extends ConsumerWidget {
                         child: const Text(
                           "Login now",
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: AppTheme.darkGreen,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -75,7 +75,20 @@ class _RecordsScreenState
           }
 
           // 🔥 Empty state
-          if (state.records.isEmpty) {
+          final validRecords =
+    state.records.where(
+  (record) {
+
+    return record
+            .reports
+            .isNotEmpty ||
+
+        record
+            .testResultFiles
+            .isNotEmpty;
+  },
+).toList();
+          if (validRecords.isEmpty) {
 
             return const Center(
               child: Column(
@@ -122,7 +135,7 @@ class _RecordsScreenState
                 const EdgeInsets.all(16),
 
             itemCount:
-                state.records.length,
+                validRecords.length,
 
             itemBuilder:
                 (context, index) {
@@ -170,7 +183,7 @@ class _RecordsScreenState
 
                   title: Text(
 
-                    record.title,
+                    record.summary,
 
                     style: const TextStyle(
                       fontWeight:

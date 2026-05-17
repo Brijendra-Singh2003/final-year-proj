@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/* import 'package:flutter/material.dart';
 import 'package:mobile/features/appointment/presentation/screen/doctor_list_screen.dart';
 import 'category_item_widget.dart';
 
@@ -101,6 +101,222 @@ class CategoryGridWidget extends StatelessWidget {
               MaterialPageRoute(
                 builder: (context) => DoctorListScreen(
                   specialty: category["value"],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+} */
+import 'package:flutter/material.dart';
+
+import 'package:mobile/core/theme/theme.dart';
+
+import 'package:mobile/features/appointment/presentation/screen/doctor_list_screen.dart';
+
+import 'category_item_widget.dart';
+
+class CategoryGridWidget
+    extends StatelessWidget {
+
+  const CategoryGridWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+
+    final categories = [
+
+      {
+        "label": "General",
+        "value":
+            "General Practitioner",
+        "icon":
+            Icons.local_hospital,
+      },
+
+      {
+        "label": "Dental",
+        "value": "Dentist",
+        "icon": Icons.medical_services,
+      },
+
+      {
+        "label": "Ortho",
+        "value":
+            "Orthopedic Surgeon",
+        "icon":
+            Icons.accessibility_new,
+      },
+
+      {
+        "label": "Dermat",
+        "value":
+            "Dermatologist",
+        "icon":
+            Icons.face_retouching_natural,
+      },
+
+      {
+        "label": "Gynaec",
+        "value":
+            "Gynecologist",
+        "icon":
+            Icons.pregnant_woman,
+      },
+
+      {
+        "label": "Pediatric",
+        "value":
+            "Pediatrician",
+        "icon":
+            Icons.child_care,
+      },
+
+      {
+        "label": "Cardio",
+        "value":
+            "Cardiologist",
+        "icon":
+            Icons.favorite,
+      },
+
+      {
+        "label": "Eye",
+        "value":
+            "Ophthalmologist",
+        "icon":
+            Icons.remove_red_eye,
+      },
+
+      {
+        "label": "ENT",
+        "value":
+            "ENT Specialist",
+        "icon":
+            Icons.hearing,
+      },
+
+      {
+        "label": "Psych",
+        "value":
+            "Psychiatrist",
+        "icon":
+            Icons.psychology,
+      },
+
+      {
+        "label": "Nutrition",
+        "value":
+            "Nutritionist",
+        "icon":
+            Icons.restaurant,
+      },
+
+      {
+        "label": "Physio",
+        "value":
+            "Physiotherapist",
+        "icon":
+            Icons.fitness_center,
+      },
+
+      {
+        "label": "Neuro",
+        "value":
+            "Neurologist",
+        "icon":
+            Icons.memory,
+      },
+
+      {
+        "label": "Urology",
+        "value":
+            "Urologist",
+        "icon":
+            Icons.health_and_safety,
+      },
+
+      {
+        "label": "Oncology",
+        "value":
+            "Oncologist",
+        "icon":
+            Icons.biotech,
+      },
+
+      {
+        "label": "View All",
+        "value": null,
+        "icon": Icons.grid_view,
+      },
+    ];
+
+    return GridView.builder(
+
+      shrinkWrap: true,
+
+      physics:
+          const NeverScrollableScrollPhysics(),
+
+      itemCount:
+          categories.length,
+
+      gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(
+
+        crossAxisCount: 4,
+
+        mainAxisSpacing: 16,
+
+        crossAxisSpacing: 16,
+
+        childAspectRatio: 0.78,
+      ),
+
+      itemBuilder:
+          (context, index) {
+
+        final category =
+            categories[index];
+
+        return CategoryItemWidget(
+
+          label:
+              category["label"]
+                  as String,
+
+          icon:
+              category["icon"]
+                  as IconData,
+
+          backgroundColor:
+              AppTheme.subtleGreen,
+
+          iconColor:
+              AppTheme.primaryGreen,
+
+          textColor:
+              AppTheme.textPrimary,
+
+          onTap: () {
+
+            Navigator.push(
+
+              context,
+
+              MaterialPageRoute(
+
+                builder:
+                    (context) =>
+                        DoctorListScreen(
+
+                  searchQuery:
+                      category["value"]
+                          as String?,
                 ),
               ),
             );

@@ -2,14 +2,15 @@
 Seed script: creates sample admin, doctors (all specialties), lab uploader, and patients.
 Run with: cd backend && python seed.py
 """
-import sys
+
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from database import engine, SessionLocal
-import models
-from auth import hash_password
+import app.models as models
+from app.config.database import SessionLocal, engine
+from app.utils.auth import hash_password
 
 # Create tables
 models.Base.metadata.create_all(bind=engine)
@@ -87,20 +88,20 @@ for i, specialty in enumerate(SPECIALTIES):
     name = doctor_names[i]
     email_prefix = name.split(" ")[0].lower()
 
-    users.append({
-        "name": name,
-        "email": f"{email_prefix}@medconnect.com",
-        "password": "doctor123",
-        "role": "doctor",
-        "specialty": specialty,
-        "phone": f"+91 98000000{i+1:02d}",
-    })
+    users.append(
+        {
+            "name": name,
+            "email": f"{email_prefix}@medconnect.com",
+            "password": "doctor123",
+            "role": "doctor",
+            "specialty": specialty,
+            "phone": f"+91 98000000{i + 1:02d}",
+        }
+    )
 
 # Insert users if not exists
 for u in users:
-    existing = db.query(models.User).filter(
-        models.User.email == u["email"]
-    ).first()
+    existing = db.query(models.User).filter(models.User.email == u["email"]).first()
 
     if not existing:
         user = models.User(
