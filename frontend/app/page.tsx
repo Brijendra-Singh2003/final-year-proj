@@ -64,9 +64,9 @@ export default function Home() {
 
       {/* ── NAVBAR ── */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-border shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
-        <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-16">
+        <div className="max-w-300 mx-auto px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-2.5">
-            <div className="animate-pulse-green bg-accent-subtle border border-accent-medium p-1.5 rounded-[10px]">
+            <div className="animate-pulse-green bg-accent-subtle border border-accent-medium p-1.5 rounded-btn">
               <Activity size={22} className="text-accent" />
             </div>
             <span className="gradient-text font-extrabold text-xl font-display">MedConnect</span>
@@ -80,16 +80,16 @@ export default function Home() {
 
       {/* ── HERO ── */}
       <section className="bg-linear-to-br from-bg-secondary via-accent-subtle to-bg-primary px-6 pt-20 pb-24 overflow-hidden">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-300 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
           {/* Copy */}
           <div
             className="transition-all duration-700"
             style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(30px)" }}
           >
-            <span className="inline-flex items-center gap-1.5 bg-accent-subtle text-accent-dark text-xs font-bold px-3.5 py-1.5 rounded-full border border-accent-medium mb-6">
+            {<span className="inline-flex items-center gap-1.5 bg-accent-subtle text-accent-dark text-xs font-bold px-3.5 py-1.5 rounded-full border border-accent-medium mb-6">
               <CheckCircle size={13} /> India&apos;s #1 Digital Health Platform
-            </span>
+            </span>}
 
             <h1 className="font-extrabold font-display text-text-primary leading-tight mb-5 text-4xl lg:text-5xl">
               Your Health,{" "}
@@ -97,7 +97,7 @@ export default function Home() {
               <br />Simplified.
             </h1>
 
-            <p className="text-text-secondary text-lg leading-relaxed mb-9 max-w-[480px]">
+            <p className="text-text-secondary text-lg leading-relaxed mb-9 max-w-120">
               Book appointments with top specialists, manage your complete medical records,
               and get the care you deserve — all from one secure platform.
             </p>
@@ -137,7 +137,7 @@ export default function Home() {
 
       {/* ── STATS ── */}
       <section className="bg-accent px-6 py-14">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+        <div className="max-w-300 mx-auto grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
           {STATS.map(({ value, label }) => (
             <div key={label} className="text-white">
               <div className="text-3xl font-extrabold font-display">{value}</div>
@@ -149,13 +149,13 @@ export default function Home() {
 
       {/* ── FEATURES ── */}
       <section className="px-6 pt-24 pb-20 bg-bg-primary">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-300 mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-extrabold font-display text-text-primary text-3xl lg:text-4xl mb-4">
               Everything you need for{" "}
               <span className="gradient-text">better healthcare</span>
             </h2>
-            <p className="text-text-secondary text-lg max-w-[520px] mx-auto">
+            <p className="text-text-secondary text-lg max-w-130 mx-auto">
               A complete digital health platform designed for patients, doctors, and healthcare administrators.
             </p>
           </div>
@@ -176,7 +176,7 @@ export default function Home() {
 
       {/* ── HOW IT WORKS ── */}
       <section className="px-6 py-20 bg-bg-secondary">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-300 mx-auto">
           <div className="text-center mb-12">
             <h2 className="font-extrabold font-display text-text-primary text-3xl lg:text-4xl mb-3.5">
               Get started in <span className="gradient-text">3 simple steps</span>
@@ -199,7 +199,7 @@ export default function Home() {
 
       {/* ── TESTIMONIALS ── */}
       <section className="px-6 py-20 bg-bg-card">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-300 mx-auto">
           <div className="text-center mb-12">
             <h2 className="font-extrabold font-display text-text-primary text-3xl lg:text-4xl">
               Loved by <span className="gradient-text">thousands</span>
@@ -226,7 +226,7 @@ export default function Home() {
 
       {/* ── CTA ── */}
       <section className="bg-linear-to-r from-accent-dark via-accent to-accent-light px-6 py-20 text-center">
-        <div className="max-w-[640px] mx-auto">
+        <div className="max-w-160 mx-auto">
           <h2 className="font-extrabold font-display text-white text-3xl lg:text-4xl mb-4">
             Ready to take control of your health?
           </h2>
@@ -235,7 +235,7 @@ export default function Home() {
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 bg-white text-accent-dark font-extrabold px-9 py-3.5 rounded-[10px] text-base no-underline shadow-[0_4px_14px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 hover:shadow-lg transition-all"
+            className="inline-flex items-center gap-2 bg-white text-accent-dark font-extrabold px-9 py-3.5 rounded-btn text-base no-underline shadow-[0_4px_14px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 hover:shadow-lg transition-all"
           >
             Create Free Account <ArrowRight size={17} />
           </Link>
@@ -244,7 +244,7 @@ export default function Home() {
 
       {/* ── FOOTER ── */}
       <footer className="bg-text-primary text-white/70 py-10 px-6 text-center">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-300 mx-auto">
           <div className="flex items-center justify-center gap-2 mb-3.5">
             <Activity size={18} className="text-accent-light" />
             <span className="font-bold text-white font-display">MedConnect</span>
