@@ -1,0 +1,1322 @@
+\documentclass[a4paper,12pt]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{tocloft}
+\usepackage{times}
+\usepackage{titlesec}
+\usepackage{float}
+\usepackage{ragged2e}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage{listings}
+\usepackage{array}
+
+% ---------------- TOC Fix ----------------
+\renewcommand{\cftchapdotsep}{1}
+\renewcommand{\cftsecdotsep}{1}
+\renewcommand{\cftsubsecdotsep}{1}
+\setlength{\cftbeforechapskip}{0.5em}
+\setlength{\cftbeforesecskip}{0.2em}
+\setlength{\cftbeforesubsecskip}{0.1em}
+\renewcommand{\cftbeforetoctitleskip}{-1em}
+\renewcommand{\cftaftertoctitleskip}{1em}
+
+% ---------------- Spacing ----------------
+\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
+\titlespacing*{\section}{0pt}{5pt}{5pt}
+\titlespacing*{\subsection}{0pt}{3pt}{3pt}
+
+% Configuration for JSON code formatting
+\lstdefinelanguage{json}{
+    basicstyle=\small\ttfamily,
+    columns=fullflexible,
+    breaklines=true,
+    postbreak=\mbox{\textcolor{black}{$\hookrightarrow$}\space},
+}
+
+% ================================================================
+\begin{document}
+
+% --- TITLE PAGE ---
+\begin{titlepage}
+    \centering
+    \vspace{2cm}
+    {\Huge \bfseries Smart Healthcare Platform}
+    \vspace{0.75cm}
+
+    {\Large \bfseries Technical Writing Report}
+    \vspace{1.5cm}
+
+    {\Large \bfseries Submitted by:} \\
+    \vspace{0.5cm}
+    {\Large Brijendra Singh (B122041)}\\[0.3cm]
+    {\Large Potnuru Sai Gopal (B122081)}\\[0.3cm]
+    {\Large Thaker Samarth Tushar (B122126)}\\[0.3cm]
+
+    \vspace{0.5cm}
+    {\Large\bfseries Under the Guidance of:} \\
+    \vspace{0.5cm}
+    {\Large {Prof. Debasish Jena}}
+
+    \vspace{1.5cm}
+    \includegraphics[width=7cm]{logo.png}\\[1cm]
+    \vfill
+
+    {\Large \textbf{Department of Computer Science and Engineering}} \\
+    \vspace{0.5cm}
+    {\Large {International Institute of Information Technology, Bhubaneswar}} \\
+    \vspace{0.5cm}
+    {\large November 2025}
+\end{titlepage}
+
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% --- APPROVAL PAGE ---
+\newpage
+\vspace*{2cm}
+\begin{center}
+    \textbf{\Large APPROVAL OF THE VIVA-VOCE BOARD}
+\end{center}
+\vspace{1cm}
+\begin{flushright}
+    May DD, YYYY
+\end{flushright}
+\vspace{1cm}
+\setstretch{1.3}
+\justifying
+Certified that the report entitled \textbf{``Smart Healthcare Platform''} submitted by \textbf{Brijendra Singh (B122041),} \textbf{Potnuru Sai Gopal (B122081)} and \textbf{Thaker Samarth Tushar (B122126)} to the {International Institute of Information Technology, Bhubaneswar}, in partial fulfillment of the requirements for the award of the Bachelor of Technology in \textbf{Computer Science and Engineering} under the BTech Programme, has been accepted by the examiners during the viva-voce examination held today.
+\setstretch{1}
+\vspace{1.5cm}
+\begin{center}
+\renewcommand{\arraystretch}{2.2}
+\begin{tabular}{p{0.82\textwidth} p{0.45\textwidth}}
+ (Supervisor) & (Panel Head) \\[0.75cm]
+\end{tabular}
+\begin{tabular}{p{0.73\textwidth} p{0.45\textwidth}}
+ (Internal Examiner 1) & (Internal Examiner 2)
+\end{tabular}
+\end{center}
+\vfill
+
+\clearpage
+
+% --- CERTIFICATE ---
+\vspace*{2cm}
+\begin{center}
+    \textbf{\Large CERTIFICATE}
+\end{center}
+\vspace{1cm}
+\setstretch{1.5}
+This is to certify that the report entitled \textbf{``Smart Healthcare Platform''} submitted by \textbf{Brijendra Singh (B122041), Potnuru Sai Gopal (B122081),} and \textbf{Thaker Samarth Tushar (B122126)} to International Institute of Information Technology, Bhubaneswar, is a record of bonafide project work under my supervision, and the report is submitted for end-semester evaluation of the BTech Degree project work.
+\setstretch{1}
+\vspace{1.5cm}
+\begin{flushleft}
+    {Prof. Debasish Jena} \\
+    \textbf{(Supervisor)}
+\end{flushleft}
+
+\clearpage
+
+% --- DECLARATION ---
+\vspace*{2cm}
+\begin{center}
+    \textbf{\Large DECLARATION}
+\end{center}
+\vspace{1cm}
+We certify that
+\setstretch{1.3}
+\begin{enumerate}
+    \item The work contained in the report has been done by our group under the general supervision of our supervisor.
+    \item The work has not been submitted to any other Institute for any degree or diploma.
+    \item We have followed the guidelines provided by the Institute in writing the thesis.
+    \item We have conformed to the norms and guidelines given in the Ethical Code of Conduct of the Institute.
+    \item Whenever We have used materials (data, theoretical analysis, and text) from other sources, We have given due credit to them by citing them in the text of the thesis and giving their details in the references.
+    \item Whenever We have quoted written materials from other sources, We have put them under quotation marks and given due credit to the sources by citing them and giving required details in the references.
+\end{enumerate}
+\setstretch{1}
+\vspace{3cm}
+\begin{flushright}
+    \textbf{Brijendra Singh} \\ {B122041}
+\end{flushright}
+\begin{flushright}
+    \textbf{Potnuru Sai Gopal} \\ {B122081}
+\end{flushright}
+\begin{flushright}
+    \textbf{Thaker Samarth Tushar} \\ {B122126}
+\end{flushright}
+
+\clearpage
+
+% --- ACKNOWLEDGMENTS ---
+\vspace*{2cm}
+\begin{center}
+    \textbf{\Large ACKNOWLEDGMENTS}
+\end{center}
+\vspace{1cm}
+We would like to share our sincere gratitude to everyone who has helped us in the making of this project. The progress of this project would not have been possible without the continuous supervision, invaluable tutelage, and treasured support of \textbf{Prof. Debasish Jena}, our esteemed guide during this project. We would like to extend our sincere gratitude to the institution for motivating us to work on the project, which enabled us to gain valuable knowledge and exposure.
+\vspace{2cm}
+\begin{flushright}
+    \textbf{Brijendra Singh}
+\end{flushright}
+\begin{flushright}
+    \textbf{Potnuru Sai Gopal}
+\end{flushright}
+\begin{flushright}
+    \textbf{Thaker Samarth Tushar}
+\end{flushright}
+
+\clearpage
+\vspace*{5cm}
+\begin{center}
+    \textbf{\Large Abstract}
+\end{center}
+\vspace{1cm}
+The present healthcare system lacks a unified digital platform where patients can seamlessly manage doctor appointments, access lab test results, and maintain a complete, cryptographically protected medical history. This Smart Healthcare Platform delivers a full-stack solution where patients can search for doctors, book appointments, and store health records digitally with strong encryption. Doctors have role-based, appointment-gated access to patient history and can assign lab tests directly through the platform. A dedicated lab portal enables laboratory staff to upload encrypted test result files that are automatically linked to the patient's medical record. The system employs AES-256-GCM encryption for all sensitive data at rest, JWT-based stateless authentication, per-IP rate limiting, and a tamper-evident audit log with SHA-256 hash chaining, laying the groundwork for future blockchain integration. This architecture enhances accessibility, reduces information loss, and supports efficient, secure, patient-centric healthcare delivery.
+
+\textbf{Keywords:} Healthcare Platform, Appointment Booking, Medical Records, AES-256-GCM, JWT Authentication, Role-Based Access Control, Audit Log, FastAPI, Flutter, Next.js.
+
+\clearpage
+
+% --- TABLE OF CONTENTS ---
+\tableofcontents
+
+\clearpage
+
+% ================================================================
+% CHAPTER 1: INTRODUCTION
+% ================================================================
+\chapter{Introduction}
+
+\large
+The Smart Healthcare Platform emerges from the critical need to modernize healthcare delivery in a world where patients still rely on physical documents, manual appointment queues, and fragmented record systems. Traditional paper-based hospital workflows and isolated digital solutions present significant limitations in accessibility, data security, and continuity of care across providers. With growing patient loads and increasing demand for digital services, healthcare institutions require intelligent systems that combine appointment management, encrypted medical record storage, and integrated lab result delivery under a single secure platform.
+
+\section{Problem Statement and Solution Approach}
+
+\textbf{Problem Statement:} While manual appointment and record-keeping processes have served healthcare institutions for decades, they exhibit critical deficiencies that undermine both operational efficiency and patient safety.
+
+\subsection{Limitations of Existing Systems}
+
+Manual appointment processes are inherently slow, creating bottlenecks during peak hours and causing long waiting times. Without digital records, patients must carry physical documents between providers, leading to incomplete histories, repeated diagnostic tests, and delayed or inaccurate diagnoses. Communication between patients, doctors, and labs remains fragmented, hampering coordinated care. Existing partial solutions such as appointment-only platforms (e.g., Practo) address only scheduling without integrating medical history. EHR systems store records within a single institution but do not assist with appointment management, lab test coordination, or cross-provider access. Lab result delivery is entirely manual, with no cryptographic guarantees of file authenticity or tamper-evidence.
+
+\subsection{Security Vulnerabilities}
+
+Existing systems leave sensitive medical data exposed through unencrypted storage, weak or absent audit trails, and no mechanism to detect retroactive tampering with records. Without centralized, role-enforced access control, unauthorized access to patient records is difficult to detect or prevent. The absence of file integrity verification means uploaded documents can be silently altered.
+
+\textbf{Solution Approach:} The Smart Healthcare Platform adopts a modular, role-based digital approach. The core design integrates:
+
+\begin{itemize}
+    \item \textbf{Role-Based Portals:} Four distinct roles --- Patient, Doctor, Lab, and Admin --- each served by tailored interfaces, ensuring streamlined workflows and minimum access privilege.
+    \item \textbf{Appointment-Gated Record Access:} Doctors may only view or write to a patient's medical record if a non-cancelled appointment exists between them, enforcing consent-driven data access at the API level.
+    \item \textbf{Encrypted Lab File Pipeline:} Lab users upload test result files through a structured assignment system. Files are encrypted with AES-256-GCM immediately upon upload and their SHA-256 hash is stored for integrity verification on download.
+    \item \textbf{Tamper-Evident Audit Logging:} Every significant action is recorded in an append-only audit log with SHA-256 hash chaining, making retrospective tampering detectable.
+    \item \textbf{Rate Limiting and JWT Authentication:} Per-IP rate limiting protects all endpoints; JWT tokens issued at login carry the user's role and expire after 60 minutes.
+\end{itemize}
+
+This approach ensures higher security, improved transparency, faster care delivery, and better scalability, while reducing the operational burden on healthcare staff.
+
+% ================================================================
+% CHAPTER 2: SOFTWARE REQUIREMENT SPECIFICATION
+% ================================================================
+\chapter{Software Requirement Specification}
+
+\section{Introduction}
+
+The purpose of this document is to outline the Software Requirements Specification (SRS) for the Smart Healthcare Platform, a solution aimed at transitioning healthcare management from fragmented, manual processes to a unified, encrypted digital platform. The system provides functionalities to manage doctor appointments, maintain encrypted patient medical records, facilitate lab test assignment and result upload, and enforce role-based access control across all operations.
+
+This SRS document defines the requirements for developing a digital healthcare platform that transforms how patients, doctors, lab staff, and administrators interact with medical data. It outlines both functional and non-functional requirements necessary to deliver a comprehensive, secure, and user-friendly system.
+
+\section{Scope}
+
+The Smart Healthcare Platform encompasses a comprehensive digital healthcare system designed to:
+
+\begin{itemize}
+    \item Provide a Flutter mobile application for patients to search doctors, book appointments, and view their encrypted medical records and lab results.
+    \item Provide a Next.js web interface for doctors to manage appointments, write consultation reports, and dispatch lab assignments.
+    \item Provide an admin portal for user management, system monitoring, and audit log verification.
+    \item Support a lab portal for lab staff to receive test assignments and upload encrypted test result files.
+    \item Maintain a tamper-evident, SHA-256 hash-chained audit log of all critical actions.
+    \item Support future enhancements including blockchain anchoring of audit logs and AI-based consultation suggestions.
+\end{itemize}
+
+\section{Definitions, Acronyms, and Abbreviations}
+
+\begin{itemize}
+    \item \textbf{Patient:} A registered user who books appointments, views their own medical records, and accesses lab test results.
+    \item \textbf{Doctor:} A registered medical professional who manages appointments, writes consultation reports, and assigns lab tests.
+    \item \textbf{Lab:} A laboratory staff user assigned by a doctor to upload encrypted test result files for a specific patient record.
+    \item \textbf{Admin:} The system administrator responsible for managing all users, monitoring appointments and records, and verifying audit log integrity.
+    \item \textbf{API:} Application Programming Interface.
+    \item \textbf{JWT:} JSON Web Token, used for stateless, role-encoded authentication.
+    \item \textbf{SRS:} Software Requirements Specification.
+    \item \textbf{AES-GCM:} Advanced Encryption Standard -- Galois/Counter Mode, the encryption algorithm used for all sensitive data at rest.
+    \item \textbf{RBAC:} Role-Based Access Control.
+    \item \textbf{ORM:} Object-Relational Mapper (SQLAlchemy 2.0).
+    \item \textbf{EHR:} Electronic Health Record.
+    \item \textbf{CORS:} Cross-Origin Resource Sharing.
+    \item \textbf{LIMS:} Laboratory Information Management System.
+\end{itemize}
+
+\section{References}
+
+This document refers to institutional project guidelines, NIST Special Publication 800-38D (AES-GCM), OWASP JWT Best Practices, FastAPI documentation, SQLAlchemy 2.0 documentation, and the Python Cryptographic Authority library documentation, as cited in the bibliography.
+
+\section{Product Perspective}
+
+The Smart Healthcare Platform operates as a standalone integrated system. It interfaces with the following components:
+
+\begin{itemize}
+    \item \textbf{Client Applications:} The Flutter mobile app (patients) and Next.js web app (doctors, admins, lab staff) communicate with the FastAPI backend via a RESTful JSON API over HTTPS.
+    \item \textbf{Data Layer:} A PostgreSQL database stores all structured data. Sensitive text fields are transparently encrypted via a custom SQLAlchemy column type (EncryptedText). Uploaded files are stored encrypted on disk using the same AES-256-GCM key infrastructure.
+    \item \textbf{Security Infrastructure:} The system relies on an AES-256-GCM encryption key, a JWT signing secret, and bcrypt for password hashing -- all loaded from server-side environment variables.
+    \item \textbf{Future Interfaces:} The audit log hash chain is designed for future anchoring to an external blockchain, and the modular API supports potential integration with diagnostic lab instruments and LIMS.
+\end{itemize}
+
+\section{Product Functions}
+
+The Smart Healthcare Platform provides the following key functions:
+
+\begin{itemize}
+    \item \textbf{User Registration and Authentication:} Secure self-registration for patients and doctors. Admin and lab role accounts are restricted from self-registration and must be provisioned by an admin. JWT tokens issued at login; stored as HttpOnly cookies.
+    \item \textbf{Doctor Search:} Patients search for doctors by name or specialization with case-insensitive partial matching.
+    \item \textbf{Appointment Management:} Patients book, view, and cancel appointments; doctors confirm or cancel appointments; the system prevents double-booking of the same doctor slot.
+    \item \textbf{Medical Record Management:} A medical record is automatically created for each patient on registration. Doctors create additional records and append consultation reports (content, diagnosis, prescription) -- all fields encrypted at rest.
+    \item \textbf{Lab Assignment and File Upload:} Doctors assign lab tests to specific lab users with an optional expiry timestamp. Lab users upload encrypted test result files; SHA-256 hash computed and stored on upload.
+    \item \textbf{File Download with Integrity Verification:} Authorized users download lab result files with optional on-the-fly SHA-256 re-verification.
+    \item \textbf{Tamper-Evident Audit Logging:} All critical actions logged with SHA-256 hash chaining; admins can trigger chain verification at any time.
+    \item \textbf{Admin Dashboard:} User management, paginated system-wide appointment and record overview, audit log browsing, and live system statistics.
+\end{itemize}
+
+\section{User Characteristics}
+
+The system serves four user groups:
+
+\begin{itemize}
+    \item \textbf{Patients:} Varied ages, potentially limited technical background. Access the system via a Flutter mobile app. Primary focus on booking appointments and accessing their own medical records and lab results. Expected to use the system on an as-needed basis.
+    \item \textbf{Doctors:} Medical professionals with varying technical proficiency. Access via a Next.js web interface. Require reliable access to patient appointments, appointment-gated medical history, and the ability to write reports and dispatch lab assignments.
+    \item \textbf{Lab Staff:} Technical background limited to their specific portal workflow. Require a clear list of assigned tests and a straightforward file upload interface.
+    \item \textbf{Administrators:} Advanced understanding of system capabilities. Require comprehensive user management tools, system-wide monitoring, audit log access with chain verification, and system statistics.
+\end{itemize}
+
+\section{Constraints}
+
+\begin{itemize}
+    \item \textbf{Technical Constraints:}
+    \begin{itemize}
+        \item The \texttt{ENCRYPTION\_KEY} and \texttt{SECRET\_KEY} environment variables must be set before the system starts; the server will not operate without them.
+        \item Admin and Lab role accounts cannot be self-registered; they must be provisioned by an existing admin.
+        \item A doctor can only read or write a patient's records if a non-cancelled appointment exists between them.
+        \item Lab assignments have an optional expiry; an expired assignment cannot be used for file upload.
+        \item Each lab assignment may only have one associated test result file, enforced by a database-level unique constraint.
+    \end{itemize}
+    \item \textbf{Regulatory Constraints:}
+    \begin{itemize}
+        \item Must comply with data protection norms regarding patient personal and medical information.
+        \item Authentication must use industry-standard mechanisms (bcrypt password hashing, JWT tokens).
+        \item Audit trails must be maintained in an append-only, tamper-evident manner.
+    \end{itemize}
+    \item \textbf{User Environment Constraints:}
+    \begin{itemize}
+        \item The system requires internet connectivity for all operations.
+        \item Patients must have a smartphone capable of running the Flutter application.
+        \item Doctors and admins require a modern web browser for the Next.js interface.
+    \end{itemize}
+\end{itemize}
+
+\section{Assumptions and Dependencies}
+
+\textbf{Assumptions:}
+\begin{itemize}
+    \item All users have access to internet-connected devices appropriate for their role.
+    \item The institution's server infrastructure can host the FastAPI backend and PostgreSQL database.
+    \item Lab staff accounts will be provisioned by an admin before use.
+    \item The \texttt{ENCRYPTION\_KEY} is a 256-bit key stored securely in server-side environment configuration and never committed to version control.
+\end{itemize}
+
+\textbf{Dependencies:}
+\begin{itemize}
+    \item FastAPI (Python 3.12) for the backend API framework.
+    \item SQLAlchemy 2.0 with PostgreSQL (via psycopg2-binary) for the data layer.
+    \item python-jose for JWT token generation and verification.
+    \item passlib[bcrypt] for secure password hashing.
+    \item cryptography library (Python Cryptographic Authority) for AES-256-GCM.
+    \item slowapi for per-IP rate limiting.
+    \item Pydantic v2 for request/response schema validation.
+    \item Flutter SDK for the patient mobile application.
+    \item Next.js (React) and Tailwind CSS for the doctor/admin/lab web interface.
+    \item Docker for containerized deployment.
+\end{itemize}
+
+\section{System Features}
+
+\begin{itemize}
+    \item \textbf{Transparent Field-Level Encryption:} A custom SQLAlchemy column type \texttt{EncryptedText} automatically applies AES-256-GCM encryption on write and decryption on read for all sensitive fields (appointment notes, record summaries, report content, diagnoses, prescriptions), requiring no changes at the application logic layer.
+    \item \textbf{File-Level Encryption:} Uploaded lab test result files are encrypted on disk using AES-256-GCM immediately after the raw bytes are written, with no plaintext window on the server filesystem.
+    \item \textbf{SHA-256 File Integrity:} The SHA-256 hash of the plaintext file bytes is computed during upload and stored. Clients may request re-verification on download; a mismatch returns an HTTP 409 error.
+    \item \textbf{Hash-Chained Audit Log:} Each audit log entry stores the SHA-256 hash of its own fields concatenated with the previous entry's hash, forming a tamper-evident chain. Admins can verify the full chain at any time via a dedicated endpoint.
+    \item \textbf{Appointment-Gated Access Control:} Doctors are blocked from reading or writing any patient record unless a valid, non-cancelled appointment exists between them and the patient.
+    \item \textbf{Lab Assignment Lifecycle Management:} Lab upload assignments follow a strict lifecycle: \texttt{assigned} $\rightarrow$ \texttt{uploaded} (or \texttt{cancelled} / \texttt{expired}), with a single-upload-per-assignment guarantee enforced at both the application and database levels.
+    \item \textbf{Auto-Provisioned Patient Records:} A medical record is automatically created for every new patient at registration.
+    \item \textbf{Live System Statistics:} An admin endpoint returns real-time counts of users by role, appointments by status, records, reports, lab assignments, and audit log entries.
+\end{itemize}
+
+\section{Functional Requirements}
+
+\subsection{User Management}
+\begin{itemize}
+    \item FR-1.1: The system shall allow self-registration with roles \texttt{patient} or \texttt{doctor} only; \texttt{admin} and \texttt{lab} roles require admin provisioning.
+    \item FR-1.2: Passwords shall be at least 8 characters and stored as bcrypt hashes; plain-text passwords shall never be persisted.
+    \item FR-1.3: The system shall issue a JWT access token (60-minute expiry) on successful login, delivered as an HttpOnly cookie.
+    \item FR-1.4: Admins shall be able to list and delete any user account, except their own.
+    \item FR-1.5: The \texttt{GET /auth/me} endpoint shall return the currently authenticated user's profile.
+\end{itemize}
+
+\subsection{Appointment Management}
+\begin{itemize}
+    \item FR-2.1: Patients shall search for doctors by name or specialization.
+    \item FR-2.2: Patients shall book appointments specifying a doctor, a date in \texttt{YYYY-MM-DD} format, and a time slot in \texttt{HH:MM AM/PM} format; the system shall reject double-booking of the same doctor slot.
+    \item FR-2.3: Patients shall view their full appointment history ordered by date descending.
+    \item FR-2.4: Patients shall cancel their own appointments.
+    \item FR-2.5: Doctors shall view all their appointments ordered by date ascending.
+    \item FR-2.6: Doctors shall confirm pending appointments.
+    \item FR-2.7: Admins shall view all appointments system-wide with pagination.
+\end{itemize}
+
+\subsection{Medical Record Management}
+\begin{itemize}
+    \item FR-3.1: A medical record shall be auto-created for each new patient at registration.
+    \item FR-3.2: Doctors shall create additional medical records for patients with whom they have a valid non-cancelled appointment.
+    \item FR-3.3: Doctors shall append consultation reports (content, diagnosis, prescription) to a patient's record; all report fields shall be encrypted at rest.
+    \item FR-3.4: Patients shall view their own medical records including all embedded reports and test result file metadata, with encrypted fields decrypted in the response.
+    \item FR-3.5: Doctors shall view records and reports for their appointment-linked patients.
+    \item FR-3.6: Admins shall view all records system-wide with pagination.
+\end{itemize}
+
+\subsection{Lab Test Management}
+\begin{itemize}
+    \item FR-4.1: Doctors shall create lab upload assignments linking a medical record to a specific lab user, with an optional expiry timestamp.
+    \item FR-4.2: Lab users shall view all assignments assigned to them, ordered by creation date descending.
+    \item FR-4.3: Lab users shall upload a test result file for an \texttt{assigned}, non-expired assignment; the file shall be encrypted on disk with AES-256-GCM and its SHA-256 hash stored.
+    \item FR-4.4: On successful upload, the assignment status shall transition to \texttt{uploaded} and a \texttt{consumed\_at} timestamp shall be recorded.
+    \item FR-4.5: Patients and doctors shall list test result file metadata for any given medical record.
+\end{itemize}
+
+\subsection{File Download and Integrity}
+\begin{itemize}
+    \item FR-5.1: Authorized users (patients for own files; doctors for files of appointment-linked patients; admins for all) shall download test result files, which are decrypted on-the-fly before delivery.
+    \item FR-5.2: Clients may pass \texttt{verify\_hash=true} to trigger SHA-256 re-computation on the stored bytes; a mismatch shall return HTTP 409.
+    \item FR-5.3: Every file download event shall be recorded in the audit log.
+\end{itemize}
+
+\subsection{Audit Logging}
+\begin{itemize}
+    \item FR-6.1: Every significant action (registration, login, logout, appointment booking/confirmation/cancellation, record access, report creation, file upload, file download, user deletion) shall produce an audit log entry.
+    \item FR-6.2: Each entry shall store the user ID, action name, resource type, resource ID, contextual details, IP address, timestamp, previous entry hash, and the current entry's SHA-256 row hash.
+    \item FR-6.3: Admins shall retrieve audit logs with optional action-based filtering and pagination.
+    \item FR-6.4: Admins shall trigger a full chain verification that returns whether the chain is valid and the ID of the first broken entry, if any.
+\end{itemize}
+
+\section{Non-Functional Requirements}
+
+\subsection{Performance Requirements}
+\begin{itemize}
+    \item NFR-P1: API endpoints shall respond within 500~ms under normal load conditions.
+    \item NFR-P2: File encryption and SHA-256 hash computation shall complete within 2~seconds for files up to 50~MB.
+    \item NFR-P3: The audit chain verification endpoint shall complete within 5~seconds for up to 100,000 log entries.
+    \item NFR-P4: The system shall support concurrent access by multiple users without data corruption, leveraging PostgreSQL transactional guarantees.
+\end{itemize}
+
+\subsection{Security Requirements}
+\begin{itemize}
+    \item NFR-S1: All client-to-backend communication shall use HTTPS/TLS.
+    \item NFR-S2: All sensitive database text fields shall be encrypted at rest using AES-256-GCM with a 256-bit environment-managed key.
+    \item NFR-S3: Uploaded files shall be encrypted on disk using AES-256-GCM with no plaintext intermediate copy persisted.
+    \item NFR-S4: User passwords shall be hashed using bcrypt with an appropriate cost factor.
+    \item NFR-S5: JWT tokens shall be signed using HMAC-SHA256 and expire within 60 minutes of issuance.
+    \item NFR-S6: All API endpoints shall be protected against brute-force via per-IP rate limiting.
+    \item NFR-S7: Role-based access control shall be enforced at every endpoint via server-side dependency injection.
+    \item NFR-S8: Admin and Lab accounts shall not be self-registerable through the public registration endpoint.
+    \item NFR-S9: The audit log shall be tamper-evident via SHA-256 hash chaining verifiable by an admin at any time.
+\end{itemize}
+
+\subsection{Usability Requirements}
+\begin{itemize}
+    \item NFR-U1: The patient Flutter app shall be compatible with both Android and iOS devices.
+    \item NFR-U2: The doctor/admin Next.js web interface shall be responsive for desktop and tablet browsers.
+    \item NFR-U3: All API error responses shall include descriptive detail messages to guide client-side user experience.
+    \item NFR-U4: Interactive API documentation shall be available automatically via FastAPI's built-in Swagger UI at \texttt{/docs}.
+\end{itemize}
+
+\subsection{Reliability Requirements}
+\begin{itemize}
+    \item NFR-R1: The system shall maintain data consistency through ORM-level transactions and PostgreSQL foreign key constraints.
+    \item NFR-R2: File upload failures shall clean up any partial temporary files, leaving no orphaned unencrypted data on disk.
+    \item NFR-R3: A database-level unique constraint on \texttt{TestResultFile. assignment\_id} shall prevent duplicate file records for a single assignment, independent of application logic.
+\end{itemize}
+
+\section{Other Requirements}
+\begin{itemize}
+    \item The deployment pipeline shall support environment-specific configuration via \texttt{.env} files and Docker containerization.
+    \item The system shall expose live system statistics to admins covering all major entity counts.
+    \item The system shall comply with institutional IT policies and applicable data protection guidelines.
+    \item Database migrations for future schema changes shall be manageable using Alembic.
+\end{itemize}
+
+
+% ================================================================
+% CHAPTER 3: PROJECT DESIGN
+% ================================================================
+\chapter{Project Design}
+
+\section{Application Design}
+
+The Smart Healthcare Platform is designed using a three-tier architecture to ensure modularity, scalability, and maintainability:
+
+\begin{itemize}
+    \item \textbf{Presentation Layer:} The patient-facing mobile application is built with Flutter, enabling cross-platform compatibility on Android and iOS. The doctor, lab, and admin interfaces are built with Next.js (React) and Tailwind CSS, providing responsive web UIs with component-based architecture. Each role has a dedicated view with tailored workflows.
+    \item \textbf{Application Layer:} Implemented with FastAPI (Python 3.12). The backend is organized into six modular routers (\texttt{/auth}, \texttt{/patients}, \texttt{/doctors}, \texttt{/lab}, \texttt{/files}, \texttt{/admin}), each handling a distinct domain of business logic. Role-based access is enforced via FastAPI dependency injection. Per-IP rate limiting is applied globally via slowapi.
+    \item \textbf{Data Layer:} PostgreSQL is the primary relational database, managed through SQLAlchemy 2.0 ORM. Sensitive text columns use a custom \texttt{EncryptedText} SQLAlchemy type that transparently applies AES-256-GCM. Uploaded files are stored encrypted on the server filesystem. The \texttt{AuditLog} table uses SHA-256 hash chaining for tamper-evidence.
+\end{itemize}
+
+\section{Data Flow Diagrams}
+
+\subsection{Authentication Flow}
+
+\begin{enumerate}
+    \item User submits credentials (email, password) from the Flutter or Next.js client.
+    \item Client sends a login request to the FastAPI backend.
+    \item Backend queries the \texttt{users} table and verifies the submitted password against the stored bcrypt hash.
+    \item On success, a JWT token (60-minute expiry, role-encoded) is generated and returned as an HttpOnly cookie.
+    \item An \texttt{auth.login} event is written to the \texttt{AuditLog} with hash chaining.
+    \item Client stores the token cookie and is redirected to role-specific routes.
+\end{enumerate}
+
+\subsection{Appointment Booking Flow}
+
+\begin{enumerate}
+    \item Authenticated patient submits an appointment booking request with a doctor ID, date, time slot, and optional notes.
+    \item Backend verifies the target user exists and holds the doctor role.
+    \item Slot conflict check: if another non-cancelled appointment exists for the same doctor, date, and time, HTTP 409 Conflict is returned.
+    \item Appointment is created with status \texttt{pending}; the notes field is encrypted at rest via the \texttt{EncryptedText} column type.
+    \item An \texttt{appointment.booked} event is written to the audit log.
+\end{enumerate}
+
+\subsection{Lab File Upload Flow}
+
+\begin{enumerate}
+    \item Doctor creates a \texttt{LabUploadAssignment} for a specific medical record, naming a lab user and optional expiry timestamp.
+    \item Lab user retrieves their list of pending assignments.
+    \item Lab user uploads a file for an \texttt{assigned}, non-expired assignment.
+    \item Backend validates assignment status and expiry before accepting the file.
+    \item File bytes are written to a temporary path; SHA-256 hash is computed incrementally during the write.
+    \item The temporary file is atomically renamed to its final path, then encrypted in-place with AES-256-GCM.
+    \item A \texttt{TestResultFile} metadata record is created with the hash values and storage path; assignment status transitions to \texttt{uploaded} with a \texttt{consumed\_at} timestamp.
+    \item A \texttt{file.uploaded} event is written to the audit log.
+\end{enumerate}
+
+\section{Module Description}
+
+\subsection{User Interface}
+
+\textbf{Flutter Mobile Application (Patient Portal):}
+
+The patient mobile application provides the following views and interactions:
+\begin{itemize}
+    \item Login and registration screens with client-side form validation.
+    \item Doctor search by name or specialty with results displayed as a scrollable list.
+    \item Appointment booking form with date and time slot selection.
+    \item Appointment history list with status indicators and a cancel action.
+    \item Medical records view displaying embedded reports (decrypted) and lab result file listings.
+\end{itemize}
+
+The app communicates with the FastAPI backend via HTTP requests. JWT tokens are managed as HttpOnly cookies through the client's cookie jar. Widget-based navigation with defined routes separates each feature into an independent screen.
+
+\textbf{Next.js Web Interface (Doctor, Lab, and Admin Portals):}
+
+The web interface is built using Next.js with React hooks and Tailwind CSS. Data is fetched from the backend with credentials mode set to \texttt{include} to transmit the HttpOnly cookie automatically. Each role is served a dedicated layout:
+
+\begin{itemize}
+    \item \textbf{Doctor Portal:} Appointment list with confirm and cancel actions; patient search; medical record viewer with report creation (diagnosis, prescription, content); lab assignment creation and tracking; lab result file viewer.
+    \item \textbf{Admin Portal:} User management table (list, delete); paginated appointment and record browsers; audit log viewer with action filter; chain verification trigger; system statistics dashboard.
+    \item \textbf{Lab Portal:} Assignment list with status indicators; file upload interface with progress feedback.
+\end{itemize}
+
+\subsection{Authentication Service}
+
+The authentication service manages registration, login, token issuance, and session validation.
+
+\textbf{Bcrypt-Based Password Hashing:} During registration, the plain-text password is hashed using bcrypt with a salt (via passlib). On login, the entered password is verified against the stored hash without ever reconstructing the original. Even if the database is compromised, passwords cannot be easily recovered.
+
+\textbf{JWT-Based Authentication:} On successful login, the server generates a JWT containing the user's ID and role, signed with HMAC-SHA256. The token is returned as an HttpOnly cookie (set to Secure in production). All protected endpoints extract and verify the token through a \texttt{get\_current\_user} FastAPI dependency. Role enforcement is applied through a higher-order dependency \texttt{require\_role} that rejects requests with insufficient privileges (HTTP 403).
+
+\section{Database Design}
+
+\subsection{Introduction}
+
+The database schema is designed to support flexible role definitions, transparent field-level encryption, efficient querying, scalable lab file tracking, and a tamper-evident audit log. PostgreSQL is chosen for its performance, strong relational integrity, ENUM type support, and transactional guarantees. All tables are created automatically on server startup via SQLAlchemy.
+
+\subsection{Database Schema Design}
+
+The schema includes the following seven primary tables:
+
+\begin{itemize}
+    \item \textbf{users:} Stores all user profiles.\\
+    Key columns: \texttt{id} (PK), \texttt{name}, \texttt{email} (unique, indexed), \texttt{hashed\_password}, \texttt{role} (ENUM: patient/doctor/lab/admin), \texttt{specialty} (nullable, for doctors), \texttt{phone}, \texttt{created\_at}.
+
+    \item \textbf{appointments:} Stores scheduled appointments between the patients and doctors. \\
+    Key columns: \texttt{id} (PK), \texttt{patient\_id} (FK $\rightarrow$ users), \texttt{doctor\_id} (FK $\rightarrow$ users), \texttt{date}, \texttt{time\_slot}, \texttt{status} (ENUM: pending/confirmed/cancelled), \texttt{notes} (EncryptedText), \texttt{created\_at}.
+
+    \item \textbf{medical\_records:} Stores per-patient medical records. \\
+    Key columns: \texttt{id} (PK), \texttt{patient\_id} (FK $\rightarrow$ users), \texttt{appointment\_id} (FK $\rightarrow$ appointments, nullable), \texttt{summary} (EncryptedText), \texttt{created\_at}, \texttt{updated\_at}.
+
+    \item \textbf{reports:} Stores consultation reports written by doctors. \\
+    Key columns: \texttt{id} (PK), \texttt{record\_id} (FK $\rightarrow$ medical\_records), \texttt{doctor\_id} (FK $\rightarrow$ users), \texttt{content} (EncryptedText), \texttt{diagnosis} (EncryptedText), \texttt{prescription} (EncryptedText), \texttt{created\_at}.
+
+    \item \textbf{lab\_upload\_assignments:} Tracks doctor-to-lab test assignments. \\
+    Key columns: \texttt{id} (PK), \texttt{record\_id} (FK), \texttt{patient\_id} (FK), \texttt{doctor\_id} (FK), \texttt{lab\_user\_id} (FK $\rightarrow$ users), \texttt{status} (ENUM: assigned / uploaded / cancelled / expired), \texttt{expires\_at}, \texttt{consumed\_at}, \texttt{created\_at}.
+
+    \item \textbf{test\_result\_files:} Stores metadata for uploaded lab files. \\
+    Key columns: \texttt{id} (PK), \texttt{assignment\_id} (FK, unique constraint),\\ \texttt{uploaded\_by\_user\_id} (FK), \texttt{original\_filename}, \texttt{content\_type}, \texttt{size\_bytes}, \texttt{storage\_path}, \texttt{hash\_algo} (``sha256''), \texttt{hash\_hex}, \texttt{created\_at}, \texttt{record\_id} (FK), \texttt{patient\_id} (FK).
+
+    \item \textbf{audit\_logs:} Records every significant system action with SHA-256 hash chaining. \\
+    Key columns: \texttt{id} (PK), \texttt{user\_id} (FK, nullable), \texttt{action} (indexed), \texttt{resource\_type}, \texttt{resource\_id}, \texttt{details}, \texttt{ip\_address}, \texttt{timestamp} (indexed), \texttt{prev\_hash}, \texttt{row\_hash}.
+\end{itemize}
+
+The schema is indexed on frequently queried fields (user email, appointment status and date, audit log action and timestamp). Foreign key constraints enforce referential integrity across all tables. Sensitive text columns are transparently encrypted via the custom \texttt{EncryptedText} SQLAlchemy type.
+
+
+% ================================================================
+% CHAPTER 4: IMPLEMENTATION
+% ================================================================
+\chapter{Implementation}
+
+The implementation of the Smart Healthcare Platform involved full-stack development across three sub-projects: the FastAPI backend, the Next.js web frontend (doctor, lab, and admin portals), and the Flutter mobile application (patient portal). The backend is the authoritative source of all business logic, security enforcement, and data management.
+
+\section{System Overview}
+
+The system integrates the following components:
+
+\begin{itemize}
+    \item A \textbf{Flutter} mobile application for patients.
+    \item A \textbf{Next.js} (React) web interface for doctors, lab staff, and administrators.
+    \item A \textbf{FastAPI} backend (Python 3.12) with six modular routers handling authentication, patient operations, doctor operations, lab file management, file downloads, and admin oversight.
+    \item A \textbf{PostgreSQL} database managed via SQLAlchemy 2.0 ORM.
+    \item An \textbf{AES-256-GCM} encryption layer for all sensitive fields in the database and all uploaded files on disk.
+    \item A \textbf{SHA-256 hash-chained audit log} for tamper-evident action tracking.
+\end{itemize}
+
+\section{Backend Implementation}
+
+The backend is organized into six modular FastAPI routers, each with a dedicated URL prefix and tag:
+
+\begin{itemize}
+    \item \textbf{auth} (\texttt{/auth}) -- User registration, login, logout, and current user retrieval.
+    \item \textbf{patients} (\texttt{/patients}) -- Doctor search, appointment booking and management, medical record and lab file viewing.
+    \item \textbf{doctors} (\texttt{/doctors}) -- Appointment confirmation, patient record management, report creation, lab assignment dispatch.
+    \item \textbf{lab} (\texttt{/lab}) -- Assignment listing and encrypted file upload for lab staff.
+    \item \textbf{files} (\texttt{/files}) -- Authenticated, role-restricted file download with optional integrity verification.
+    \item \textbf{admin} (\texttt{/admin}) -- User management, system-wide data access, audit log browsing and chain verification, system statistics.
+\end{itemize}
+
+\subsection{Encryption}
+
+All sensitive database fields use a custom SQLAlchemy \texttt{EncryptedText} column type that intercepts writes (encrypting the plaintext with AES-256-GCM and a random 12-byte nonce, then base64-encoding the result) and intercepts reads (decoding and decrypting transparently). The AES-256-GCM key is loaded exclusively from the \texttt{ENCRYPTION\_KEY} environment variable and is never stored in the codebase or database.
+
+Uploaded lab test result files undergo a parallel process: bytes are written to a temporary path on disk while the SHA-256 hash is computed incrementally. The temporary file is then atomically renamed to its final path, immediately followed by in-place AES-256-GCM encryption. At no point does an unencrypted file persist permanently on the server.
+
+\subsection{Authentication and Authorization}
+
+User passwords are hashed with bcrypt (via passlib) before storage. On login, the submitted password is verified against the stored hash. A JWT containing the user's ID and role is issued on success, signed with HMAC-SHA256, and delivered as an HttpOnly cookie (Secure flag enabled in production). All protected endpoints extract the token through the \texttt{get\_current\_user} FastAPI dependency. Role enforcement is applied by a higher-order \texttt{require\_role} dependency, returning HTTP 403 for insufficient privileges.
+
+Doctor access to patient data is further gated at the business logic level: a doctor may only view, create, or append to a patient's medical records and reports if a non-cancelled appointment exists between them.
+
+\subsection{Audit Logging}
+
+Every significant system action invokes the shared \texttt{audit.log()} utility, which: fetches the most recent audit log entry, takes its \texttt{row\_hash} as \texttt{prev\_hash}, serializes all fields of the new entry as a deterministic JSON string, computes the SHA-256 hash of that string, and writes the new entry to the database. The \texttt{verify\_chain()} function iterates all entries in ascending order, recomputing each hash and comparing it to the stored value, returning the ID of the first broken entry if any discrepancy is found.
+
+\section{Frontend Implementation}
+
+\subsection{Flutter Mobile Application}
+The patient app uses the Flutter \texttt{http} package to communicate with the FastAPI backend. JWT cookies are managed by the client's cookie jar and attached automatically to each request. The app uses widget-based navigation with defined routes per feature: doctor search, appointment booking form, appointment history list, and medical record viewer.
+
+\subsection{Next.js Web Interface}
+The web interface uses React functional components with hooks for state management and data fetching. All API calls use the Fetch API with \texttt{credentials: 'include'} to send the HttpOnly JWT cookie. Tailwind CSS provides consistent styling. Each role (doctor, admin, lab) is served a dedicated page layout with navigation limited to that role's permitted actions.
+
+\section{Technology Stack}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{ll}
+\toprule
+\textbf{Layer} & \textbf{Technology} \\
+\midrule
+Patient Mobile App & Flutter (Dart) \\
+Doctor / Admin / Lab Web & Next.js (React) + Tailwind CSS \\
+Backend API & FastAPI (Python 3.12) \\
+ORM & SQLAlchemy 2.0 \\
+Database & PostgreSQL + psycopg2-binary \\
+Authentication & python-jose (JWT) + passlib (bcrypt) \\
+Field Encryption & AES-256-GCM via cryptography library \\
+File Encryption & AES-256-GCM (same key, on-disk) \\
+File Integrity & SHA-256 hash on upload; re-verified on download \\
+Audit Log & SHA-256 hash chaining \\
+Rate Limiting & slowapi \\
+Data Validation & Pydantic v2 \\
+Containerization & Docker \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+% ================================================================
+% CHAPTER 5: TESTING
+% ================================================================
+\chapter{Testing}
+
+The Smart Healthcare Platform was tested through manual testing methods during and after each development phase to verify correct functioning of all core features, role-based workflows, and security mechanisms.
+
+\section{Manual Testing}
+
+\subsection{API Testing}
+
+All backend API routes were tested using the built-in FastAPI Swagger UI (\texttt{/docs}) and curl to validate request and response schema correctness, JWT cookie handling across endpoints, role-based access enforcement, and the encryption round-trip (confirming that sensitive fields are stored as ciphertext in PostgreSQL and correctly decrypted on retrieval).
+
+\subsection{Functional Testing}
+
+Each user role was manually tested end-to-end through the respective client application:
+
+\begin{itemize}
+    \item \textbf{Patient:} Registration $\rightarrow$ auto medical record creation $\rightarrow$ login $\rightarrow$ doctor search by name and specialty $\rightarrow$ appointment booking $\rightarrow$ appointment history view $\rightarrow$ appointment cancellation $\rightarrow$ medical record and report viewing $\rightarrow$ lab result file listing.
+    \item \textbf{Doctor:} Login $\rightarrow$ appointment list $\rightarrow$ appointment confirmation $\rightarrow$ patient record access (with and without a valid appointment) $\rightarrow$ report creation (content, diagnosis, prescription) $\rightarrow$ lab assignment creation $\rightarrow$ lab assignment status tracking $\rightarrow$ test file listing.
+    \item \textbf{Lab:} Login $\rightarrow$ assignment list view $\rightarrow$ file upload for an assigned record $\rightarrow$ assignment status transition to \texttt{uploaded} verification $\rightarrow$ rejection of upload attempt on an already-consumed assignment.
+    \item \textbf{Admin:} Login $\rightarrow$ full user list view $\rightarrow$ user deletion $\rightarrow$ system-wide appointment and record browsing $\rightarrow$ audit log viewing with action filter $\rightarrow$ audit chain verification $\rightarrow$ system statistics retrieval.
+\end{itemize}
+
+\subsection{Database Validation}
+
+The PostgreSQL database was inspected directly after key operations to verify:
+\begin{itemize}
+    \item Sensitive text fields stored as base64-encoded AES-256-GCM ciphertext, not plaintext.
+    \item Uploaded file bytes stored encrypted on disk with no plaintext version present.
+    \item Audit log \texttt{row\_hash} values matching independently recomputed SHA-256 hashes.
+    \item Foreign key constraints preventing orphaned records on deletion.
+    \item The unique constraint on \texttt{TestResultFile.assignment\_id} blocking duplicate file records.
+\end{itemize}
+
+\subsection{Edge Case Testing}
+
+Key boundary and error cases were deliberately tested:
+
+\begin{itemize}
+    \item \textbf{Duplicate slot booking:} A second appointment for the same doctor, date, and time returns HTTP 409 Conflict.
+    \item \textbf{Expired lab assignment:} An upload attempt after the \texttt{expires\_at} timestamp returns HTTP 409; the assignment status is updated to \texttt{expired}.
+    \item \textbf{Duplicate file upload:} A second upload attempt for the same assignment returns HTTP 409 due to the database unique constraint.
+    \item \textbf{Unauthorized record access:} A doctor without a non-cancelled appointment with a patient receives HTTP 403 on all record, report, and file endpoints for that patient.
+    \item \textbf{File integrity failure:} Manually corrupting a stored encrypted file on disk and requesting download with \texttt{verify\_hash=true} returns HTTP 409 with the message ``File integrity check failed''.
+    \item \textbf{Audit chain tampering:} Manually altering a \texttt{row\_hash} value in the database causes the chain verification endpoint to return \texttt{\{"valid": false, "first\_broken\_id": N\}}.
+    \item \textbf{Weak password:} Registration with a password fewer than 8 characters returns HTTP 422 with a Pydantic validation error.
+    \item \textbf{Restricted role self-registration:} Attempting to register with role \texttt{admin} or \texttt{lab} returns HTTP 422 with ``Cannot self-register with this role''.
+    \item \textbf{Admin self-deletion:} Attempting to delete one's own admin account returns HTTP 400 with ``Cannot delete yourself''.
+\end{itemize}
+
+\section{Bug Tracking and Fixes}
+
+FastAPI's built-in request logging and Python's \texttt{logging} module were used throughout development to trace request flows and diagnose issues. SQLAlchemy query logging was enabled in development mode to verify ORM-generated SQL and identify performance concerns. The most significant bugs resolved during development included:
+
+\begin{itemize}
+    \item A file handling issue where the temporary file was not atomically replaced before in-place encryption, leaving a brief window of unencrypted data. Fixed by using \texttt{os.replace()} for atomic rename before the encryption step.
+    \item An unhandled \texttt{IntegrityError} on duplicate lab file upload that surfaced as an internal server error. Fixed by catching the exception at the ORM layer and returning HTTP 409 with a descriptive message.
+    \item An audit log chain inconsistency during rapid concurrent writes caused by non-atomic reads of the latest \texttt{row\_hash}. Mitigated by fetching the previous log entry within the same database session immediately before inserting the new entry.
+\end{itemize}
+
+
+% ================================================================
+% CHAPTER 6: DEPLOYMENT
+% ================================================================
+\chapter{Deployment}
+
+The deployment process ensures the Smart Healthcare Platform is accessible via a secure, containerized infrastructure suitable for both development and production environments.
+
+\section{Backend Deployment}
+
+The FastAPI backend is containerized using Docker. A \texttt{Dockerfile} is provided in the backend repository root. The container runs Uvicorn (ASGI server) and creates all database tables on startup via SQLAlchemy's \texttt{metadata.create\_all()}. The application listens on port 8000 by default.
+
+\section{Environment Configuration}
+
+All secrets and environment-specific settings are stored in a \texttt{.env} file that is never committed to version control. An \texttt{.env.example} file is provided listing all required variables:
+
+\begin{itemize}
+    \item \texttt{DATABASE\_URL} -- PostgreSQL connection string.
+    \item \texttt{SECRET\_KEY} -- JWT signing secret (HMAC-SHA256).
+    \item \texttt{ENCRYPTION\_KEY} -- Base64-encoded 256-bit AES key for field and file encryption.
+    \item \texttt{ENV} -- Deployment environment (\texttt{dev} or \texttt{production}); controls cookie Secure flag and SameSite policy.
+    \item \texttt{FRONTEND\_URL} -- Trusted frontend origin for CORS configuration.
+\end{itemize}
+
+\section{CORS Configuration}
+
+Cross-Origin Resource Sharing (CORS) is configured in FastAPI to allow requests only from the origin specified by \texttt{FRONTEND\_URL}. All HTTP methods and headers are permitted from this origin; credentials (cookies) are included. This prevents unauthorized browser-based cross-origin requests.
+
+\section{Frontend Deployment}
+
+\begin{itemize}
+    \item \textbf{Next.js Web App:} Built using \texttt{npm run build} and served as a Node.js server or static export. The backend API base URL is configured via the \texttt{NEXT\_PUBLIC\_API\_URL} environment variable at build time.
+    \item \textbf{Flutter Mobile App:} Built using \texttt{flutter build apk} for Android or \texttt{flutter build ios} for iOS. The backend API URL is configured as a compile-time constant in the application source.
+\end{itemize}
+
+\section{Database Setup}
+
+PostgreSQL is provisioned as a separate service. The SQLAlchemy ORM creates all required tables automatically on the first backend startup. For production environments, schema migrations can be managed using Alembic to support incremental updates without data loss. A development-only SQLite database file (\texttt{medapp.db}) is included in the repository for local testing without a PostgreSQL instance.
+
+\section{Monitoring and Logging}
+
+\begin{itemize}
+    \item Uvicorn access logs provide HTTP request-level logging in production, including method, path, status code, and response time.
+    \item The \texttt{AuditLog} database table provides application-level action logging with full tamper-evidence via hash chaining.
+    \item Admins monitor system health in real time via the making a get request to \texttt{/admin/stats} endpoint, which reports live counts across all major entities.
+    \item Audit chain integrity can be verified at any time via making a get request to \texttt{/admin/audit-logs/verify} endpoint, providing assurance that no log entries have been retroactively altered.
+\end{itemize}
+
+
+% ================================================================
+% CHAPTER 7: API DOCUMENTATION
+% ================================================================
+\chapter{API Documentation}
+
+This chapter describes all RESTful endpoints exposed by the Smart Healthcare Platform backend. All endpoints require a valid JWT in the \texttt{access\_token} HttpOnly cookie unless marked as Public. Sensitive response fields (notes, diagnosis, prescription, summary) are transparently decrypted before being returned in responses. All responses use JSON; file download endpoints return binary streams.
+
+Base URL: \texttt{https://patient-management-vku0.onrender.com}
+
+\section{Table Creation (Initialization)}
+
+On server startup, the backend ensures all required database tables exist by executing \texttt{Base.metadata.create\_all(bind=engine)}. The seven tables created are: \texttt{users}, \texttt{appointments}, \texttt{medical\_records}, \texttt{reports}, \texttt{lab\_upload\_assignments}, \texttt{test\_result\_files}, and \texttt{audit\_logs}.
+
+\section{Authentication (/auth)}
+
+\subsection{Register}
+
+Registers a new user. Only \texttt{patient} and \texttt{doctor} roles may self-register. \\
+\texttt{POST /auth/register} \hfill Public
+
+\noindent\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "name": "Riya Sharma",
+  "email": "riya@example.com",
+  "password": "SecurePass1",
+  "role": "patient",
+  "phone": "+91...",
+  "specialty": null
+}
+\end{lstlisting}
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{201 Created:} \texttt{UserOut} object. For patients, a medical record is auto-created.
+    \item \textbf{400 Bad Request:} Email already registered.
+    \item \textbf{422 Unprocessable Entity:} Validation error (password $<$ 8 chars, restricted role).
+\end{itemize}
+
+\subsection{Login}
+
+Authenticates a user and sets an HttpOnly JWT cookie. \\
+\texttt{POST /auth/login} \hfill Public
+
+\noindent\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "email": "riya@example.com",
+  "password": "SecurePass1"
+}
+\end{lstlisting}
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:}
+\begin{lstlisting}[language=json]
+{
+  "message": "Login successful",
+  "user": { ... },
+  "token": "<jwt>"
+}
+\end{lstlisting}
+    \item \textbf{401 Unauthorized:} Invalid email or password.
+\end{itemize}
+
+\subsection{Logout}
+
+Clears the \texttt{access\_token} cookie and records an \texttt{auth.logout} audit event. \\
+\texttt{POST /auth/logout} \hfill Authenticated
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:}
+\begin{lstlisting}[language=json]
+{
+  "message": "Logged out"
+}
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Get Current User}
+
+Returns the currently authenticated user's profile. \\
+\texttt{GET /auth/me} \hfill Authenticated
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} \texttt{UserOut} object.
+\end{itemize}
+
+\section{Patients (/patients)}
+
+\subsection{Search Doctors}
+
+Query parameters: \texttt{name} (optional), \texttt{specialty} (optional). Case-insensitive partial match. \\
+\texttt{GET /patients/doctors/search} \hfill Authenticated
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{UserOut} objects with role \texttt{doctor}.
+\end{itemize}
+
+\subsection{Book Appointment}
+
+Date format: \texttt{YYYY-MM-DD}. Time slot format: \texttt{HH:MM AM/PM}. Notes are encrypted at rest. \\
+\texttt{POST /patients/appointments} \hfill Patient only
+
+\noindent\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "doctor_id": 5,
+  "date": "2025-12-15",
+  "time_slot": "10:00 AM",
+  "notes": "Fever for 3 days"
+}
+\end{lstlisting}
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{201 Created:} \texttt{AppointmentOut} with status \texttt{pending}.
+    \item \textbf{404 Not Found:} Doctor not found.
+    \item \textbf{409 Conflict:} Time slot already booked.
+\end{itemize}
+
+\subsection{List My Appointments}
+
+Returns appointments ordered by date descending. \\
+\texttt{GET /patients/appointments} \hfill Patient only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{AppointmentOut}.
+\end{itemize}
+
+\subsection{Cancel Appointment}
+
+Cancels an active appointment. \\
+\texttt{PATCH /patients/appointments/\{appt\_id\}/cancel} \hfill Patient only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Updated \texttt{AppointmentOut} with status \texttt{cancelled}.
+    \item \textbf{400 Bad Request:} Appointment already cancelled.
+    \item \textbf{404 Not Found:} Appointment not found.
+\end{itemize}
+
+\subsection{View My Medical Records}
+
+Returns all medical records belonging to the authenticated patient, including embedded reports and test result file metadata. All encrypted fields are decrypted in the response. \\
+\texttt{GET /patients/records} \hfill Patient only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{MedicalRecordOut}.
+\end{itemize}
+
+\subsection{List Test Files for a Record}
+
+Lists all test files tied to a record. \\
+\texttt{GET /patients/records/\{record\_id\}/test-files} \hfill Patient only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{TestResultFileOut}.
+    \item \textbf{404 Not Found:} Record not found or not owned by the patient.
+\end{itemize}
+
+\section{Doctors (/doctors)}
+
+\subsection{List My Appointments}
+
+Returns appointments ordered by date ascending. \\
+\texttt{GET /doctors/appointments} \hfill Doctor only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{AppointmentOut}.
+\end{itemize}
+
+\subsection{Confirm Appointment}
+
+Confirms a booked appointment. \\
+\texttt{PATCH /doctors/appointments/\{appt\_id\}/confirm} \hfill Doctor only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Updated \texttt{AppointmentOut} with status \texttt{confirmed}.
+    \item \textbf{404 Not Found:} Appointment not found.
+\end{itemize}
+
+\subsection{List My Patients}
+
+Returns all patients who have ever booked an appointment with this doctor. \\
+\texttt{GET /doctors/patients} \hfill Doctor only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{UserOut}.
+\end{itemize}
+
+\subsection{List Lab Users}
+
+Returns all registered lab users for selection when creating an assignment. \\
+\texttt{GET /doctors/lab-users} \hfill Doctor only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{UserOut} with role \texttt{lab}.
+\end{itemize}
+
+\subsection{Create Patient Medical Record}
+
+Requires a valid non-cancelled appointment with the patient. \\
+\texttt{POST /doctors/patients/\{patient\_id\}/records} \hfill Doctor only
+
+\noindent\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "summary": "Post-operative follow-up"
+}
+\end{lstlisting}
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{201 Created:} \texttt{MedicalRecordOut}.
+    \item \textbf{403 Forbidden:} No appointment with this patient.
+\end{itemize}
+
+\subsection{View Patient Records}
+
+Requires a valid appointment. All encrypted fields are decrypted in the response. \\
+\texttt{GET /doctors/patients/\{patient\_id\}/records} \hfill Doctor only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{MedicalRecordOut}.
+    \item \textbf{403 Forbidden:} No appointment with this patient.
+\end{itemize}
+
+\subsection{Append Report to Record}
+
+All fields are encrypted at rest. \\
+\texttt{POST /doctors/records/\{record\_id\}/reports} \hfill Doctor only
+
+\noindent\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "content": "Patient reports...",
+  "diagnosis": "Acute bronchitis",
+  "prescription": "Amoxicillin 500mg"
+}
+\end{lstlisting}
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{201 Created:} \texttt{ReportOut} with decrypted fields.
+    \item \textbf{403 Forbidden:} No appointment with this patient.
+    \item \textbf{404 Not Found:} Medical record not found.
+\end{itemize}
+
+\subsection{Create Lab Assignment}
+
+The \texttt{expires\_at} field is optional. \\
+\texttt{POST /doctors/records/\{record\_id\}/lab-assignments} \hfill Doctor only
+
+\noindent\textbf{Request Body:}
+\begin{lstlisting}[language=json]
+{
+  "lab_user_id": 8,
+  "expires_at": "2025-12-20T18:00:00"
+}
+\end{lstlisting}
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{201 Created:} \texttt{LabUploadAssignmentOut} with status \texttt{assigned}.
+    \item \textbf{400 Bad Request:} \texttt{expires\_at} is in the past.
+    \item \textbf{403 Forbidden:} No appointment with this patient.
+    \item \textbf{404 Not Found:} Lab user not found or does not hold the lab role.
+\end{itemize}
+
+\subsection{List Lab Assignments for a Record}
+
+Lists all lab assignments linked to a medical record. \\
+\texttt{GET /doctors/records/\{record\_id\}/lab-assignments} \hfill Doctor only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{LabUploadAssignmentOut}.
+\end{itemize}
+
+\subsection{List Test Files for a Record}
+
+Lists all uploaded test files linked to a medical record. \\
+\texttt{GET /doctors/records/\{record\_id\}/test-files} \hfill Doctor only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{TestResultFileOut}.
+\end{itemize}
+
+\section{Lab (/lab)}
+
+\subsection{List My Assignments}
+
+Returns assignments ordered by creation date descending. \\
+\texttt{GET /lab/assignments} \hfill Lab only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{LabUploadAssignmentOut}.
+\end{itemize}
+
+\subsection{Upload Test Result File}
+
+Multipart file upload (\texttt{multipart/form-data}). Assignment must be in \texttt{assigned} status and not expired. The backend writes file bytes to disk while computing the SHA-256 hash incrementally, then encrypts the file in-place with AES-256-GCM. Assignment status transitions to \texttt{uploaded} with a \texttt{consumed\_at} timestamp. \\
+\texttt{POST /lab/assignments/\{assignment\_id\}/upload} \hfill Lab only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{201 Created:} \texttt{TestResultFileOut} including \texttt{hash\_algo} (\texttt{"sha256"}) and \texttt{hash\_hex}.
+    \item \textbf{403 Forbidden:} Assignment not assigned to this lab user.
+    \item \textbf{404 Not Found:} Assignment not found.
+    \item \textbf{409 Conflict:} Assignment not in \texttt{assigned} state, expired, or duplicate upload attempt.
+\end{itemize}
+
+\section{Files (/files)}
+
+\subsection{Download Test Result File}
+
+Query parameter: \texttt{verify\_hash} (boolean, default \texttt{false}). Authorization: patients may download only their own files; doctors may download files belonging to patients with a non-cancelled appointment; admins have unrestricted access. If \texttt{verify\_hash=true}, the SHA-256 hash is recomputed on the stored bytes and compared to the stored \texttt{hash\_hex}; a mismatch returns HTTP 409. The file is decrypted on-the-fly before delivery. A \texttt{file.downloaded} audit event is recorded. \\
+\texttt{GET /files/\{file\_id\}/download} \hfill Authenticated
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Binary file stream with \texttt{Content-Disposition: attachment} header.
+    \item \textbf{403 Forbidden:} Insufficient access rights for this file.
+    \item \textbf{404 Not Found:} File not found.
+    \item \textbf{409 Conflict:} File integrity check failed.
+\end{itemize}
+
+\section{Admin (/admin)}
+
+\subsection{List All Users}
+
+Lists all users in the system. \\
+\texttt{GET /admin/users} \hfill Admin only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of all \texttt{UserOut} objects.
+\end{itemize}
+
+\subsection{Delete User}
+
+Deletes a user account. \\
+\texttt{DELETE /admin/users/\{user\_id\}} \hfill Admin only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{204 No Content}
+    \item \textbf{400 Bad Request:} Cannot delete your own account.
+    \item \textbf{404 Not Found:} User not found.
+\end{itemize}
+
+\subsection{List All Appointments}
+
+Paginated via \texttt{skip} and \texttt{limit} query parameters. \\
+\texttt{GET /admin/appointments?skip=0\&limit=50} \hfill Admin only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{AppointmentOut}.
+\end{itemize}
+
+\subsection{List All Records}
+
+All system encrypted fields are transparently decrypted in the response. \\
+\texttt{GET /admin/records?skip=0\&limit=50} \hfill Admin only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:} Array of \texttt{MedicalRecordOut}.
+\end{itemize}
+
+\subsection{Browse Audit Logs}
+
+Optional \texttt{action} filter for exact match. Returns total count and paginated items including the \texttt{row\_hash} per entry. \\
+\texttt{GET /admin/audit-logs?skip=0\&limit=50\&action=file.uploaded} \hfill Admin only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:}
+\begin{lstlisting}[language=json]
+{
+  "total": 100,
+  "items": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "action": "file.uploaded",
+      "resource_type": "test_result",
+      "resource_id": 4,
+      "details": "...",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-12-15T10:00:00",
+      "row_hash": "abc123xyz..."
+    }
+  ]
+}
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Verify Audit Chain}
+
+Iterates all audit log entries in ascending order and recomputes each hash chain link. Returns immediately on the first broken entry. \\
+\texttt{GET /admin/audit-logs/verify} \hfill Admin only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK (Valid Chain):}
+\begin{lstlisting}[language=json]
+{
+  "valid": true,
+  "first_broken_id": null
+}
+\end{lstlisting}
+    \item \textbf{200 OK (Tampered Chain):}
+\begin{lstlisting}[language=json]
+{
+  "valid": false,
+  "first_broken_id": 47
+}
+\end{lstlisting}
+\end{itemize}
+
+\subsection{System Statistics}
+
+Returns total metric counts across system entities. \\
+\texttt{GET /admin/stats} \hfill Admin only
+
+\noindent\textbf{Responses:}
+\begin{itemize}
+    \item \textbf{200 OK:}
+\begin{lstlisting}[language=json]
+{
+  "users": {
+    "patient": 120,
+    "doctor": 15,
+    "lab": 5,
+    "admin": 2
+  },
+  "appointments": {
+    "total": 340,
+    "pending": 45,
+    "confirmed": 280,
+    "cancelled": 15
+  },
+  "records": 125,
+  "reports": 310,
+  "lab_assignments": 88,
+  "audit_logs": 2041
+}
+\end{lstlisting}
+\end{itemize}
+
+% ================================================================
+% CHAPTER 8: FUTURE SCOPE
+% ================================================================
+\chapter{Future Scope}
+
+The Smart Healthcare Platform has been architected with extensibility as a first-class concern. The following directions represent natural next steps for the platform.
+
+\section{Blockchain Anchoring of Audit Logs}
+
+The audit log already uses SHA-256 hash chaining to create a tamper-evident record within the system. In a future version, the cumulative root hash of the audit log can be periodically anchored to a public or permissioned blockchain (such as Ethereum or Hyperledger Fabric), providing cryptographically verifiable, externally auditable proof of all system actions without exposing any patient data on-chain. This would allow independent third parties to verify the integrity of the medical audit trail at any time.
+
+\section{AI-Based Consultation Suggestions}
+
+Artificial Intelligence can be integrated to analyze patient history, uploaded reports, and symptoms in order to provide decision-support suggestions before or during a consultation. Machine learning models could help identify risk factors, recommend preliminary tests, or flag unusual patterns in a patient's longitudinal record \cite{parmentola2022}. Natural language processing could also enable patients and staff to query records through conversational interfaces.
+
+\section{Telemedicine and Video Call Support}
+
+The platform can be expanded to support secure video consultations between patients and doctors. This would be especially useful for rural patients, elderly users, post-operative follow-ups, or emergency situations where physical visits are not feasible. End-to-end encrypted video channels would preserve the platform's existing security model.
+
+\section{Automatic Lab Result Integration}
+
+The current system requires a lab staff user to manually upload result files through the portal. In a future version, the platform can expose a machine-to-machine API allowing diagnostic lab instruments and Laboratory Information Management Systems (LIMS) to push results directly, further reducing turnaround time and eliminating manual upload steps entirely.
+
+\section{Zero-Knowledge Proofs for Selective Disclosure}
+
+Future versions could employ zero-knowledge proof techniques to allow patients to share verifiable claims about their medical status (such as vaccination status or the absence of a specific condition) with third parties, without revealing the full contents of their medical record. This preserves privacy while enabling credential-based access to services.
+
+\section{Multi-Language Support}
+
+To improve adoption across diverse populations, the platform can add support for multiple regional and international languages in both the Flutter mobile app and the Next.js web interface, improving healthcare accessibility for patients who are not comfortable with English.
+
+\clearpage
+
+\begin{thebibliography}{99}
+
+\bibitem{bain2019}
+Bain, C. (2019). \textit{Developing Effective Hospital Management Information Systems}. MBBS Research Publication.
+
+\bibitem{musa2015}
+Musa, A. (2015). \textit{A Hospital Resource and Patient Management System}. Lancashire, UK.
+
+\bibitem{ehr2021}
+U.S. Department of Health. (2021). \textit{Electronic Health Records Overview}. Available at: \url{https://www.healthit.gov/}
+
+\bibitem{practo2020}
+Practo Technologies Pvt. Ltd. (2020). \textit{Online Doctor Appointment System}. Available at: \url{https://www.practo.com/}
+
+\bibitem{parmentola2022}
+Parmentola, A., Serravalle, F. and Walsh, D. (2022). \textit{Impacts of AI Assistance in Medical Diagnosis and Healthcare Decision Making}. International Journal of Medical Informatics.
+
+\bibitem{fastapi}
+Ramírez, S. (2024). \textit{FastAPI Documentation}. Available at: \url{https://fastapi.tiangolo.com/}
+
+\bibitem{sqlalchemy}
+Bayer, M. (2024). \textit{SQLAlchemy 2.0 Documentation}. Available at: \url{https://docs.sqlalchemy.org/}
+
+\bibitem{cryptography}
+Python Cryptographic Authority. (2024). \textit{cryptography: Cryptographic Recipes and Primitives for Python}. Available at: \url{https://cryptography.io/}
+
+\bibitem{nistgcm}
+NIST. (2007). \textit{Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM)}. Special Publication 800-38D.
+
+\bibitem{owaspjwt}
+OWASP Foundation. (2024). \textit{JSON Web Token Best Practices}. Available at: \url{https://owasp.org/}
+
+\bibitem{pydantic}
+Colvin, S. (2024). \textit{Pydantic v2 Documentation}. Available at: \url{https://docs.pydantic.dev/}
+
+\end{thebibliography}
+
+\end{document}
