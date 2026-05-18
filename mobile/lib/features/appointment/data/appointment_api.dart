@@ -87,4 +87,12 @@ return data
     )
     .toList();
   }
+  Future<void> cancelAppointment(
+  int appointmentId,
+) async {
+
+  await _client.dio.patch(
+    "/patients/appointments/$appointmentId/cancel",
+  );
+}
 }

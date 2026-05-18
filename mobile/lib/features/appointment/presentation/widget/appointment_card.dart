@@ -1,180 +1,3 @@
-/* import 'package:flutter/material.dart';
-import 'package:mobile/core/theme/theme.dart';
-import '../../data/models/appointment_model.dart';
-
-class AppointmentCard extends StatelessWidget {
-
-  final AppointmentModel appointment;
-
-  const AppointmentCard({
-    super.key,
-    required this.appointment,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-
-    final bool isCompleted = appointment.status?.toLowerCase() ==
-            "completed";
-
-    return Card(
-
-      elevation: 3,
-
-      margin: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 8,
-      ),
-
-      shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(16),
-      ),
-
-      child: Padding(
-
-        padding: const EdgeInsets.all(16),
-
-        child: Row(
-
-          children: [
-
-            // 👨‍⚕️ Doctor Icon
-            CircleAvatar(
-
-              radius: 28,
-
-              backgroundColor:
-                  isCompleted
-
-                      ? Colors.grey.shade300
-
-                      : Colors.blue.shade100,
-
-              child: Icon(
-
-                Icons.medical_services,
-
-                color:
-                    isCompleted
-                        ? Colors.grey
-                        : i,
-              ),
-            ),
-
-            const SizedBox(width: 16),
-
-            // 📄 Appointment Info
-            Expanded(
-
-              child: Column(
-
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-
-                children: [
-
-                  // 👨‍⚕️ Doctor Name
-                  Text(
-
-                    appointment.doctorName??"Doctor name",
-
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // 📅 Date
-                  Row(
-
-                    children: [
-
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-
-                      const SizedBox(width: 6),
-
-                      Text(
-                        appointment.date??"dd-mm-yyyy",
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  // ⏰ Time
-                  Row(
-
-                    children: [
-
-                      const Icon(
-                        Icons.access_time,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-
-                      const SizedBox(width: 6),
-
-                      Text(
-                        appointment.time??"hh:mm",
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // 📌 Status
-            Container(
-
-              padding:
-                  const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 6,
-              ),
-
-              decoration: BoxDecoration(
-
-                color: isCompleted
-
-                    ? Colors.grey.shade200
-
-                    : Colors.green.shade100,
-
-                borderRadius:
-                    BorderRadius.circular(
-                  20,
-                ),
-              ),
-
-              child: Text(
-
-                appointment.status??"Status",
-
-                style: TextStyle(
-
-                  fontWeight:
-                      FontWeight.w600,
-
-                  color: isCompleted
-                      ? Colors.grey
-                      : Colors.green,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-} */
 import 'package:flutter/material.dart';
 
 import 'package:mobile/core/theme/theme.dart';
@@ -187,11 +10,16 @@ class AppointmentCard
   final AppointmentModel
       appointment;
 
+  final VoidCallback?
+      onCancel;
+
   const AppointmentCard({
 
     super.key,
 
     required this.appointment,
+
+    this.onCancel,
   });
 
   @override
@@ -248,182 +76,305 @@ class AppointmentCard
         padding:
             const EdgeInsets.all(16),
 
-        child: Row(
+        child: Column(
 
           children: [
 
-            // 👨‍⚕️ Icon
-            CircleAvatar(
+            Row(
 
-              radius: 28,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
 
-              backgroundColor:
-                  isCompleted
-                      ? Colors.grey.shade200
-                      : AppTheme.subtleGreen,
+              children: [
 
-              child: Icon(
+                // 👨‍⚕️ Icon
+                CircleAvatar(
 
-                Icons.medical_services,
+                  radius: 28,
 
-                size: 28,
+                  backgroundColor:
+                      isCompleted
+                          ? Colors.grey.shade200
+                          : AppTheme
+                              .subtleGreen,
 
-                color:
-                    isCompleted
-                        ? Colors.grey
-                        : AppTheme
-                            .primaryGreen,
-              ),
-            ),
+                  child: Icon(
 
-            const SizedBox(width: 16),
+                    Icons.medical_services,
 
-            // 📄 Info
-            Expanded(
+                    size: 28,
 
-              child: Column(
+                    color:
+                        isCompleted
+                            ? Colors.grey
+                            : AppTheme
+                                .primaryGreen,
+                  ),
+                ),
 
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
+                const SizedBox(
+                  width: 16,
+                ),
 
-                children: [
+                // 📄 Appointment Info
+                Expanded(
 
-                  // 👨‍⚕️ Doctor Name
-                  Text(
+                  child: Column(
 
-                    appointment
-                            .doctorName ??
-                        "Doctor",
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
 
-                    style:
-                        const TextStyle(
+                    children: [
 
-                      fontSize: 17,
+                      // 👨‍⚕️ Doctor Name
+                      Text(
 
-                      fontWeight:
-                          FontWeight.bold,
+                        appointment
+                                .doctorName ??
+                            "Doctor",
 
-                      color: AppTheme
-                          .textPrimary,
+                        style:
+                            const TextStyle(
+
+                          fontSize: 17,
+
+                          fontWeight:
+                              FontWeight.bold,
+
+                          color: AppTheme
+                              .textPrimary,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 10,
+                      ),
+
+                      // 📅 Date
+                      Row(
+
+                        children: [
+
+                          Icon(
+
+                            Icons
+                                .calendar_today,
+
+                            size: 16,
+
+                            color: AppTheme
+                                .textMuted,
+                          ),
+
+                          const SizedBox(
+                            width: 6,
+                          ),
+
+                          Text(
+
+                            appointment.date ??
+                                "dd-mm-yyyy",
+
+                            style:
+                                const TextStyle(
+
+                              color: AppTheme
+                                  .textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 6,
+                      ),
+
+                      // ⏰ Time
+                      Row(
+
+                        children: [
+
+                          Icon(
+
+                            Icons.access_time,
+
+                            size: 16,
+
+                            color: AppTheme
+                                .textMuted,
+                          ),
+
+                          const SizedBox(
+                            width: 6,
+                          ),
+
+                          Text(
+
+                            appointment.time ??
+                                "hh:mm",
+
+                            style:
+                                const TextStyle(
+
+                              color: AppTheme
+                                  .textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 📌 Status
+                Container(
+
+                  padding:
+                      const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
+
+                  decoration:
+                      BoxDecoration(
+
+                    color:
+                        statusBgColor,
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      20,
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 10,
+                  child: Text(
+
+                    appointment.status ??
+                        "Status",
+
+                    style: TextStyle(
+
+                      fontWeight:
+                          FontWeight.w600,
+
+                      color:
+                          statusTextColor,
+                    ),
                   ),
-
-                  // 📅 Date
-                  Row(
-
-                    children: [
-
-                      Icon(
-
-                        Icons
-                            .calendar_today,
-
-                        size: 16,
-
-                        color: AppTheme
-                            .textMuted,
-                      ),
-
-                      const SizedBox(
-                        width: 6,
-                      ),
-
-                      Text(
-
-                        appointment.date ??
-                            "dd-mm-yyyy",
-
-                        style:
-                            const TextStyle(
-
-                          color: AppTheme
-                              .textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(
-                    height: 6,
-                  ),
-
-                  // ⏰ Time
-                  Row(
-
-                    children: [
-
-                      Icon(
-
-                        Icons.access_time,
-
-                        size: 16,
-
-                        color: AppTheme
-                            .textMuted,
-                      ),
-
-                      const SizedBox(
-                        width: 6,
-                      ),
-
-                      Text(
-
-                        appointment.time ??
-                            "hh:mm",
-
-                        style:
-                            const TextStyle(
-
-                          color: AppTheme
-                              .textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
 
-            // 📌 Status
-            Container(
+            // ❌ Cancel Button
+            if (isPending)
 
-              padding:
-                  const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 7,
-              ),
+              Padding(
 
-              decoration: BoxDecoration(
+                padding:
+                    const EdgeInsets.only(
+                  top: 18,
+                ),
 
-                color:
-                    statusBgColor,
+                child:
+                    Align(
 
-                borderRadius:
-                    BorderRadius.circular(
-                  20,
+                  alignment:
+                      Alignment.centerRight,
+
+                  child:
+                      OutlinedButton.icon(
+
+                    onPressed: () {
+
+                      showDialog(
+
+                        context: context,
+
+                        builder:
+                            (context) =>
+                                AlertDialog(
+
+                          title:
+                              const Text(
+                            "Cancel Appointment",
+                          ),
+
+                          content:
+                              const Text(
+                            "Are you sure you want to cancel this appointment?",
+                          ),
+
+                          actions: [
+
+                            TextButton(
+
+                              onPressed:
+                                  () {
+
+                                Navigator.pop(
+                                  context,
+                                );
+                              },
+
+                              child:
+                                  const Text(
+                                "No",
+                              ),
+                            ),
+
+                            ElevatedButton(
+
+                              onPressed:
+                                  () {
+
+                                Navigator.pop(
+                                  context,
+                                );
+
+                                onCancel
+                                    ?.call();
+                              },
+
+                              style:
+                                  ElevatedButton.styleFrom(
+
+                                backgroundColor:
+                                    Colors.red,
+                              ),
+
+                              child:
+                                  const Text(
+                                "Yes",
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+
+                    icon: const Icon(
+                      Icons.cancel_outlined,
+                    ),
+
+                    label: const Text(
+                      "Cancel Appointment",
+                    ),
+
+                    style:
+                        OutlinedButton.styleFrom(
+
+                      foregroundColor:
+                          Colors.red,
+
+                      side:
+                          const BorderSide(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-
-              child: Text(
-
-                appointment.status ??
-                    "Status",
-
-                style: TextStyle(
-
-                  fontWeight:
-                      FontWeight.w600,
-
-                  color:
-                      statusTextColor,
-                ),
-              ),
-            ),
           ],
         ),
       ),

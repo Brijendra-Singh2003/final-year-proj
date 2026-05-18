@@ -68,4 +68,23 @@ class AppointmentController extends StateNotifier<AppointmentState> {
       state = state.copyWith(isLoading: false, error: message);
     }
   }
+  Future<void> cancelAppointment(
+  int appointmentId,
+) async {
+
+  try {
+
+    await _api.cancelAppointment(
+      appointmentId,
+    );
+
+    await fetchAppointments();
+
+  } catch (e) {
+
+    state = state.copyWith(
+      error: e.toString(),
+    );
+  }
+}
 }

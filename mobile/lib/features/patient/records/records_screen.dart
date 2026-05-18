@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mobile/features/authentication/presentation/widget/customAppBar.dart';
+import 'package:mobile/features/patient/records/record_detail_screen.dart';
 
 import 'package:mobile/riverpod/records/record_provider.dart';
 
@@ -183,7 +184,7 @@ class _RecordsScreenState
 
                   title: Text(
 
-                    record.summary,
+                    record.summary??"",
 
                     style: const TextStyle(
                       fontWeight:
@@ -203,10 +204,44 @@ class _RecordsScreenState
                     ),
                   ),
 
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 18,
-                  ),
+                  trailing: IconButton(
+
+  icon: const Icon(
+    Icons.arrow_forward_ios,
+    size: 18,
+  ),
+
+  onPressed: () {
+
+    Navigator.push(
+
+      context,
+
+      MaterialPageRoute(
+
+        builder:
+            (context) =>
+                RecordDetailScreen(
+
+          doctorName:
+              record.doctorName??"",
+
+          date:
+              record.createdAt,
+
+          diagnosis:
+              record.diagnosis??"",
+
+          medicine:
+              record.medicine??"",
+
+          notes:
+              record.summary??"",
+        ),
+      ),
+    );
+  },
+),
                 ),
               );
             },

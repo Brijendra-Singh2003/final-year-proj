@@ -5,7 +5,7 @@ class BookingConfirmationDialog extends StatelessWidget {
   final DateTime date;
   final String time;
 
-  const BookingConfirmationDialog({
+   const BookingConfirmationDialog({
     super.key,
     required this.doctorName,
     required this.date,
@@ -13,6 +13,7 @@ class BookingConfirmationDialog extends StatelessWidget {
   });
 
   @override
+
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("Confirm Appointment"),
