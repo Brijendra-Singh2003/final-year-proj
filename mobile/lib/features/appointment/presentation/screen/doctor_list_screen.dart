@@ -71,9 +71,15 @@ final filteredDoctors =
       doctor.specialty
           .toLowerCase();
 
-  return doctorName.contains(query) ||
+  /* return doctorName.contains(query) ||
 
-      doctorSpecialty.contains(query);
+      doctorSpecialty.contains(query); */
+      return doctorName.contains(query) ||
+
+       doctorSpecialty
+               .trim()
+               .toLowerCase() ==
+           query;
 
 }).toList();
 //final filteredDoctors = doctorState.doctors;
